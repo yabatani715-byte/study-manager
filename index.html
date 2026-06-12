@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0e1016">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="学習管理">
+<link rel="manifest" href="study-manifest.json">
+<link rel="apple-touch-icon" href="icon-study-180.png">
+<link rel="icon" href="icon-study-192.png">
+<title>学習管理 — 課題・ノート</title>
+<style>
+:root{
+  --bg:#0e1016; --panel:#171a25; --panel2:#1f2333; --border:#2b3045;
+  --text:#e9ebf5; --muted:#9aa0b6; --accent:#4f9dff;
+  --ok:#3ddc84; --danger:#ff5d6c; --warn:#ffb454; --yellow:#ffe14d;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg);
+  background-image:radial-gradient(900px 420px at 85% -120px, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%);
+  color:var(--text);
+  font-family:"Segoe UI","Hiragino Sans","Yu Gothic UI","Meiryo",system-ui,sans-serif;
+  line-height:1.55;
+  min-height:100vh;
+}
+.wrap{max-width:880px;margin:0 auto;padding:22px 16px 64px}
+@supports (padding: max(0px)){
+  .wrap{padding:calc(18px + env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) calc(64px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left))}
+}
+header{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+header h1{font-size:21px;margin:0;letter-spacing:.02em}
+.syncstat{font-size:11.5px;color:var(--muted)}
+.syncstat.on{color:var(--ok)}
+.banner{display:none;background:rgba(79,157,255,.1);border:1px solid rgba(79,157,255,.4);color:#bcd8ff;padding:10px 14px;border-radius:10px;margin-bottom:14px;font-size:13.5px;align-items:center;gap:10px;flex-wrap:wrap}
+.banner button{flex:none}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.tab{display:inline-flex;align-items:center;gap:7px;padding:9px 15px;border-radius:999px;border:1px solid var(--border);background:var(--panel);color:var(--muted);cursor:pointer;font-weight:600;font-size:14px;font-family:inherit;touch-action:manipulation;user-select:none}
+.tab:hover{color:var(--text);border-color:#3a4060}
+.tab.active{background:color-mix(in srgb, var(--accent) 24%, var(--panel));border-color:var(--accent);color:#fff}
+.tab .nbadge{background:var(--danger);color:#fff;font-size:11px;font-weight:800;border-radius:999px;padding:0 7px;min-width:19px;text-align:center;line-height:1.6}
+.tab .nbadge.calm{background:#3a4060}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:16px}
+.card h2{margin:0 0 14px;font-size:16px;display:flex;align-items:center;gap:9px}
+.card h2::before{content:"";width:4px;height:17px;border-radius:2px;background:var(--accent);flex:none}
+.card h2 .countb{margin-left:auto;font-size:12px;color:var(--muted);font-weight:600}
+label{display:block;font-size:12.5px;color:var(--muted);margin-bottom:5px;font-weight:600}
+input[type=text],input[type=date],textarea,select{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:9px 12px;color:var(--text);font-size:16px;font-family:inherit;min-height:42px}
+input[type=date]{-webkit-appearance:none;appearance:none}
+textarea{resize:vertical}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent)}
+input.error{border-color:var(--danger)}
+.frow{display:grid;gap:10px;margin-bottom:12px}
+.frow.c2{grid-template-columns:1fr 1fr}
+.frow.c3{grid-template-columns:1.2fr 1fr 1fr}
+@media(max-width:560px){.frow.c3{grid-template-columns:1fr 1fr}.frow.c3 .span2{grid-column:1/-1}}
+.ghost{background:transparent;border:1px solid var(--border);color:var(--muted);padding:8px 13px;border-radius:9px;cursor:pointer;font-size:13.5px;font-family:inherit;touch-action:manipulation}
+.ghost:hover{color:var(--text);border-color:#4a5172}
+.accentbtn{background:var(--accent);border:1px solid var(--accent);color:#0a1422;font-weight:700;padding:10px 16px;border-radius:10px;cursor:pointer;font-size:14.5px;font-family:inherit;touch-action:manipulation}
+.accentbtn:hover{filter:brightness(1.1)}
+.accentbtn:disabled,.ghost:disabled{opacity:.45;cursor:default}
+.mini{border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:8px;padding:8px 13px;font-size:12.5px;cursor:pointer;font-weight:600;font-family:inherit;touch-action:manipulation}
+.mini:hover{border-color:#4a5172}
+.mini.save{background:var(--accent);border-color:var(--accent);color:#0a1422}
+.icon-btn{background:transparent;border:1px solid var(--border);border-radius:8px;cursor:pointer;padding:7px 9px;font-size:14px;line-height:1;touch-action:manipulation;color:var(--text)}
+.icon-btn:hover{border-color:#4a5172;background:rgba(255,255,255,.04)}
+.chips{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+@media(max-width:560px){.chips{grid-template-columns:repeat(2,1fr)}}
+.chip{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:11px 14px}
+.clabel{font-size:11.5px;color:var(--muted);font-weight:600}
+.cval{font-size:22px;font-weight:800;margin-top:1px}
+.cval.red{color:var(--danger)}.cval.orange{color:var(--warn)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.filters select{width:auto;min-width:150px;padding:7px 10px;min-height:0}
+h3.gh{margin:18px 0 9px;font-size:13px;color:var(--muted);font-weight:700;display:flex;align-items:center;gap:7px}
+h3.gh.red{color:var(--danger)}h3.gh.orange{color:var(--warn)}
+.alist{display:flex;flex-direction:column;gap:8px}
+.aitem{display:flex;gap:11px;padding:11px 12px;background:var(--panel2);border:1px solid var(--border);border-radius:12px;align-items:flex-start}
+.aitem.done{opacity:.55}
+.chk{width:26px;height:26px;border-radius:8px;border:2px solid #3a4060;background:transparent;cursor:pointer;flex:none;margin-top:3px;color:transparent;font-size:15px;font-weight:900;line-height:1;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
+.chk.on{background:var(--ok);border-color:var(--ok);color:#06220f}
+.amain{flex:1;min-width:0}
+.atitle{font-weight:700;font-size:14.5px;word-break:break-word}
+.aitem.done .atitle{text-decoration:line-through}
+.ameta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px;font-size:12px;color:var(--muted)}
+.sdot{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none;vertical-align:middle}
+.subtag{display:inline-flex;align-items:center;gap:5px;font-weight:600}
+.dbadge{font-size:11px;padding:1px 9px;border-radius:999px;border:1px solid #3a4060;font-weight:700;color:var(--muted)}
+.dbadge.ov{color:var(--danger);border-color:rgba(255,93,108,.55);background:rgba(255,93,108,.1)}
+.dbadge.today{color:var(--warn);border-color:rgba(255,180,84,.55);background:rgba(255,180,84,.1)}
+.dbadge.soon{color:var(--yellow);border-color:rgba(255,225,77,.4)}
+.amemo{margin-top:6px;font-size:12.5px;color:#cdd1e2;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.05);padding:5px 9px;border-radius:8px;white-space:pre-wrap;word-break:break-word}
+.hacts{display:flex;gap:6px;flex:none}
+.empty{color:var(--muted);font-size:13.5px;padding:14px 4px;text-align:center}
+details.donewrap{margin-top:18px}
+details.donewrap summary{cursor:pointer;color:var(--muted);font-size:13px;font-weight:700;user-select:none}
+.filebtn{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;border:1.5px dashed #3a4060;background:rgba(79,157,255,.05);color:var(--text);border-radius:12px;padding:15px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;touch-action:manipulation}
+.filebtn:hover{border-color:var(--accent)}
+.dgroup{margin-bottom:18px}
+.dghead{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:9px}
+.dghead .dt{font-weight:800;font-size:15px}
+.dghead .cnt{font-size:12px;color:var(--muted)}
+.dghead .claudebtn{margin-left:auto;background:linear-gradient(135deg,#c96f4a,#b85a3a);border:none;color:#fff;font-weight:700;padding:7px 14px;border-radius:999px;cursor:pointer;font-size:12.5px;font-family:inherit;touch-action:manipulation;display:inline-flex;align-items:center;gap:6px}
+.dghead .claudebtn:hover{filter:brightness(1.12)}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}
+.fitem{min-width:0;cursor:pointer}
+.fthumb{width:100%;aspect-ratio:1;border-radius:10px;border:1px solid var(--border);background:var(--panel2);object-fit:cover;display:block}
+.fthumb.icon{display:flex;align-items:center;justify-content:center;font-size:34px}
+.fname{font-size:10.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:3px}
+.fsub{font-size:10.5px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.slist{display:flex;flex-direction:column;gap:8px}
+.sitem{display:flex;align-items:center;gap:11px;padding:11px 13px;background:var(--panel2);border:1px solid var(--border);border-radius:12px}
+.sitem .sdot{width:13px;height:13px}
+.sname{font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.scnt{font-size:11.5px;color:var(--muted);flex:none}
+.swatches{display:flex;gap:7px;flex-wrap:wrap}
+.sw{width:30px;height:30px;border-radius:50%;border:2px solid transparent;cursor:pointer;flex:none;touch-action:manipulation}
+.sw.sel{border-color:#fff;box-shadow:0 0 0 2px var(--accent)}
+.qadds{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.tlist{display:flex;flex-direction:column;gap:7px}
+.titem{display:flex;gap:9px;align-items:center;padding:9px 11px;background:var(--panel2);border:1px solid var(--border);border-radius:11px}
+.titem .chk{margin-top:0;width:24px;height:24px}
+.titem .ttl{flex:1;min-width:0;font-weight:700;font-size:13.5px;word-break:break-word}
+.titem .ttl .tsub{font-weight:600;font-size:12px;margin-right:5px}
+.tpri{font-size:10.5px;font-weight:800;color:var(--muted);flex:none;border:1px solid var(--border);border-radius:999px;padding:1px 8px;white-space:nowrap}
+.tpri.ov{color:var(--danger);border-color:rgba(255,93,108,.5);background:rgba(255,93,108,.08)}
+.tpri.today{color:var(--warn);border-color:rgba(255,180,84,.5);background:rgba(255,180,84,.08)}
+.tpri.soon{color:var(--yellow);border-color:rgba(255,225,77,.4)}
+.todo-acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.claudebtn2{background:linear-gradient(135deg,#c96f4a,#b85a3a);border:none;color:#fff;font-weight:700;padding:8px 14px;border-radius:999px;cursor:pointer;font-size:12.5px;font-family:inherit;touch-action:manipulation;display:inline-flex;align-items:center;gap:6px}
+.claudebtn2:hover{filter:brightness(1.12)}
+.mnote{font-size:12px;color:var(--muted);margin-top:9px}
+.howto{font-size:13.5px;color:#cdd1e2}
+.howto b{color:var(--text)}
+.howto ol{margin:8px 0;padding-left:20px}
+.howto li{margin-bottom:5px}
+.kbd{background:var(--panel2);border:1px solid var(--border);border-radius:6px;padding:1px 7px;font-size:12px}
+.overlay{display:none;position:fixed;inset:0;background:rgba(5,7,12,.78);z-index:50;align-items:center;justify-content:center;padding:16px}
+.overlay.open{display:flex}
+.modal{background:var(--panel);border:1px solid var(--border);border-radius:16px;max-width:560px;width:100%;max-height:88vh;overflow-y:auto;padding:18px;-webkit-overflow-scrolling:touch}
+.modal h3{margin:0 0 12px;font-size:15.5px}
+.pvimg{max-width:100%;max-height:58vh;border-radius:10px;display:block;margin:0 auto}
+.pvicon{font-size:64px;text-align:center;padding:24px 0}
+.pvname{font-size:13px;color:var(--muted);text-align:center;margin:10px 0;word-break:break-all}
+.mbtns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:14px}
+.flist-check{display:flex;flex-direction:column;gap:6px;margin-bottom:12px;max-height:180px;overflow-y:auto}
+.flist-check label{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--text);font-weight:500;margin:0;background:var(--panel2);border:1px solid var(--border);border-radius:9px;padding:7px 10px;cursor:pointer}
+.flist-check input{width:17px;height:17px;accent-color:var(--accent);flex:none}
+.flist-check .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.presets{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}
+.optrow{display:flex;align-items:center;gap:8px;font-size:13px;margin:10px 0;color:var(--text)}
+.optrow input{width:17px;height:17px;accent-color:var(--accent)}
+.danger-btn{background:transparent;border:1px solid rgba(255,93,108,.5);color:var(--danger);padding:8px 13px;border-radius:9px;cursor:pointer;font-size:13px;font-family:inherit;touch-action:manipulation}
+.danger-btn:hover{background:rgba(255,93,108,.1)}
+.setrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+#toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:#222842;border:1px solid #3a4060;color:#fff;padding:10px 18px;border-radius:999px;font-size:13.5px;font-weight:600;opacity:0;pointer-events:none;transition:all .25s;z-index:99;max-width:88vw;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>📚 学習管理</h1>
+    <div class="syncstat" id="syncstat">フォルダ未連携</div>
+  </header>
+
+  <div class="banner" id="reconnect-banner">
+    <span>前回連携したフォルダに再接続できます。</span>
+    <button class="mini save" id="btn-reconnect">再接続する</button>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="tasks">📝 課題 <span class="nbadge calm" id="task-badge">0</span></button>
+    <button class="tab" data-tab="notes">📒 ノート</button>
+    <button class="tab" data-tab="subjects">📖 教科</button>
+    <button class="tab" data-tab="settings">⚙️ 設定</button>
+  </div>
+
+  <!-- ============ 課題 ============ -->
+  <section id="panel-tasks">
+    <div class="card">
+      <h2>📋 今日のTODO <span class="countb" id="todo-date"></span></h2>
+      <div class="tlist" id="todo-list"></div>
+      <div class="todo-acts">
+        <button class="claudebtn2" id="btn-todo-claude">🤖 Claudeに今日の計画を相談</button>
+        <button class="mini" id="btn-todo-copy">コピー</button>
+        <button class="mini" id="btn-ics">📅 期限を通知付きでカレンダー登録</button>
+      </div>
+    </div>
+    <div class="chips">
+      <div class="chip"><div class="clabel">期限切れ</div><div class="cval red" id="c-over">0</div></div>
+      <div class="chip"><div class="clabel">今日まで</div><div class="cval orange" id="c-today">0</div></div>
+      <div class="chip"><div class="clabel">7日以内</div><div class="cval" id="c-week">0</div></div>
+      <div class="chip"><div class="clabel">未完了 合計</div><div class="cval" id="c-open">0</div></div>
+    </div>
+
+    <div class="card">
+      <h2 id="aform-title">課題を追加</h2>
+      <div class="frow c3">
+        <div class="span2"><label>課題名 *</label><input type="text" id="a-title" placeholder="例: 数学プリント p.12〜14"></div>
+        <div><label>教科</label><select id="a-subj"></select></div>
+        <div><label>提出期限</label><input type="date" id="a-due"></div>
+      </div>
+      <div class="frow">
+        <div><label>メモ（任意）</label><input type="text" id="a-memo" placeholder="例: ノート提出も一緒に"></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="accentbtn" id="btn-add-assign" style="flex:1">追加する</button>
+        <button class="ghost hidden" id="btn-cancel-edit">キャンセル</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>課題一覧 <span class="countb" id="a-count"></span></h2>
+      <div class="filters">
+        <select id="f-subj"><option value="all">すべての教科</option></select>
+      </div>
+      <div id="assign-list"></div>
+    </div>
+  </section>
+
+  <!-- ============ ノート ============ -->
+  <section id="panel-notes" class="hidden">
+    <div class="card">
+      <h2>ノート・プリントを追加</h2>
+      <div class="frow c2">
+        <div><label>日付</label><input type="date" id="n-date"></div>
+        <div><label>教科</label><select id="n-subj"></select></div>
+      </div>
+      <label class="filebtn" for="n-files">📷 写真・PDF・ファイルを追加（複数OK）</label>
+      <input type="file" id="n-files" multiple accept="image/*,application/pdf,.txt,.md" class="hidden">
+      <div class="mnote">スマホなら「写真を撮る」でその場で撮影できます。画像は自動で軽量化して保存します。</div>
+    </div>
+
+    <div class="card">
+      <h2>保存したノート <span class="countb" id="n-count"></span></h2>
+      <div class="filters">
+        <select id="fn-subj"><option value="all">すべての教科</option></select>
+      </div>
+      <div id="notes-list"></div>
+    </div>
+  </section>
+
+  <!-- ============ 教科 ============ -->
+  <section id="panel-subjects" class="hidden">
+    <div class="card">
+      <h2>教科を追加</h2>
+      <div class="frow">
+        <div><label>教科名</label><input type="text" id="s-name" placeholder="例: 数学"></div>
+      </div>
+      <label>カラー</label>
+      <div class="swatches" id="s-colors"></div>
+      <div style="margin-top:12px"><button class="accentbtn" id="btn-add-subj" style="width:100%">教科を追加</button></div>
+      <div class="qadds" id="s-quick"></div>
+    </div>
+    <div class="card">
+      <h2>教科一覧 <span class="countb" id="s-count"></span></h2>
+      <div class="slist" id="subj-list"></div>
+    </div>
+  </section>
+
+  <!-- ============ 設定 ============ -->
+  <section id="panel-settings" class="hidden">
+    <div class="card">
+      <h2>🤖 Claudeとの使い方</h2>
+      <div class="howto">
+        <b>📱 スマホ（iPhone）の場合</b>
+        <ol>
+          <li>ノートタブで写真を撮って保存</li>
+          <li>日付の横の <b>「Claudeに質問」</b> ボタンを押す</li>
+          <li>質問を選んで <b>「共有する」</b> → 共有シートで <b>Claudeアプリ</b> を選ぶと、写真と質問文がそのまま送れます</li>
+        </ol>
+        <b>💻 PC（Claude Code）の場合</b>
+        <ol>
+          <li>下の「フォルダ連携」で <span class="kbd">claude 君用</span> 内の <span class="kbd">学習データ</span> フォルダを連携</li>
+          <li>ノートのファイルが <span class="kbd">学習データ/ノート/日付/</span> に自動保存されます</li>
+          <li>Claude Codeに「<b>今日のノートをまとめて</b>」「<b>学習データの6/12の数学プリントを解説して</b>」のように話しかけるだけでOK</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🔔 iPhoneに通知を受け取る</h2>
+      <div class="howto">
+        <ol>
+          <li>課題タブの <b>「📅 期限を通知付きでカレンダー登録」</b> を押して、共有先で「カレンダー」を選ぶ（またはダウンロードしたファイルを開く）</li>
+          <li>未完了の課題が予定として登録され、<b>提出前日の19時</b> と <b>当日の朝8時</b> にiPhoneの通知が届きます</li>
+          <li>課題を追加・変更したら、もう一度登録し直してください（前の予定が残って重複したら、古い方を消せばOK）</li>
+          <li>Safariの共有メニュー →「<b>ホーム画面に追加</b>」でアプリとして使うと、アイコンに急ぎの課題数バッジが付きます</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📂 フォルダ連携（PC向け）</h2>
+      <div class="mnote" style="margin:0 0 10px">iCloud Drive内のフォルダと連携すると、データ(JSON)とノートのファイルを自動で書き出し、スマホからの書き出しJSONも自動で取り込みます。</div>
+      <div class="setrow">
+        <button class="accentbtn" id="btn-folder">フォルダを連携する</button>
+        <button class="ghost hidden" id="btn-folder-off">連携を解除</button>
+        <span class="mnote" id="folder-stat" style="margin:0"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🔄 書き出し・読み込み（スマホ⇔PC同期）</h2>
+      <div class="optrow"><input type="checkbox" id="exp-files" checked><label for="exp-files" style="margin:0;font-size:13px;color:var(--text)">ノートのファイルも含める <span id="exp-size" style="color:var(--muted)"></span></label></div>
+      <div class="setrow">
+        <button class="accentbtn" id="btn-export-share">📤 共有で書き出し</button>
+        <button class="ghost" id="btn-export-dl">ダウンロード</button>
+        <label class="ghost" for="imp-file" style="display:inline-flex;align-items:center;cursor:pointer;margin:0">📥 読み込み</label>
+        <input type="file" id="imp-file" accept=".json,application/json" class="hidden">
+      </div>
+      <div class="mnote">スマホ→「共有で書き出し」→「"ファイル"に保存」でiCloudの<span class="kbd">claude 君用/学習データ</span>に保存すると、PC側が自動で取り込みます。</div>
+    </div>
+
+    <div class="card">
+      <h2>🗑️ データ</h2>
+      <div class="mnote" id="data-stat" style="margin:0 0 10px"></div>
+      <button class="danger-btn" id="btn-wipe">すべてのデータを削除</button>
+    </div>
+  </section>
+</div>
+
+<!-- ファイルプレビュー -->
+<div class="overlay" id="pv-modal">
+  <div class="modal">
+    <div id="pv-body"></div>
+    <div class="pvname" id="pv-name"></div>
+    <div class="mbtns">
+      <button class="mini" id="pv-open">開く</button>
+      <button class="mini" id="pv-dl">ダウンロード</button>
+      <button class="danger-btn" id="pv-del">削除</button>
+      <button class="mini" id="pv-close">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<!-- Claudeに質問 -->
+<div class="overlay" id="cl-modal">
+  <div class="modal">
+    <h3>🤖 Claudeに質問 <span id="cl-date" style="color:var(--muted);font-weight:600;font-size:13px"></span></h3>
+    <label>送るファイル</label>
+    <div class="flist-check" id="cl-files"></div>
+    <label>質問の内容</label>
+    <div class="presets">
+      <button class="mini" data-q="このノート・プリントの内容を要点ごとにわかりやすくまとめてください。重要な用語や公式は箇条書きで整理してください。">📝 ノートまとめ</button>
+      <button class="mini" data-q="このノート・プリントの範囲から、テスト対策の練習問題を5問作ってください。解答と解説もつけてください。">✏️ テスト対策問題</button>
+      <button class="mini" data-q="このノート・プリントの内容を、初めて習う人にもわかるようにやさしく解説してください。">💡 やさしく解説</button>
+    </div>
+    <textarea id="cl-q" rows="4" placeholder="質問を入力（上のボタンでも入力できます）"></textarea>
+    <div class="optrow"><input type="checkbox" id="cl-tasks"><label for="cl-tasks" style="margin:0;font-size:13px;color:var(--text)">未完了の課題リストも一緒に送る</label></div>
+    <div class="mnote hidden" id="cl-pcnote"></div>
+    <div class="mbtns">
+      <button class="accentbtn" id="cl-share">📤 共有する（ファイル付き）</button>
+      <button class="mini" id="cl-open">Claudeで開く（文章のみ）</button>
+      <button class="mini" id="cl-copy">コピー</button>
+      <button class="mini" id="cl-close">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+'use strict';
+/* ===================== 基本 ===================== */
+const LS_KEY='study-manager-v1';
+const WRITTEN_KEY='study-manager-written-v1';
+const APP_TAG='study-manager';
+const el=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2,10));
+const PALETTE=['#ff5d6c','#ffb454','#ffe14d','#3ddc84','#4fd8d4','#5fb6ff','#8b6cff','#ff7ad9','#a8b3cf'];
+const PRESET_SUBJECTS=['国語','数学','英語','理科','社会','情報'];
+const WD='日月火水木金土';
+
+function today(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function fmtJP(ds){if(!ds)return '';const d=new Date(ds+'T00:00:00');if(isNaN(d))return ds;return `${d.getMonth()+1}/${d.getDate()}(${WD[d.getDay()]})`;}
+function daysUntil(ds){return Math.round((new Date(ds+'T00:00:00')-new Date(today()+'T00:00:00'))/864e5);}
+function dueLabel(ds){const n=daysUntil(ds);if(n<0)return `${-n}日超過`;if(n===0)return '今日まで';if(n===1)return '明日まで';return `あと${n}日`;}
+function dueClass(ds){const n=daysUntil(ds);if(n<0)return 'ov';if(n===0)return 'today';if(n<=3)return 'soon';return '';}
+function fmtSize(b){if(b>1048576)return (b/1048576).toFixed(1)+'MB';if(b>1024)return Math.round(b/1024)+'KB';return b+'B';}
+function toast(msg){const t=el('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._tm);t._tm=setTimeout(()=>t.classList.remove('show'),2400);}
+
+/* ===================== 状態 ===================== */
+let S=loadState();
+function loadState(){
+  try{const d=JSON.parse(localStorage.getItem(LS_KEY));
+    if(d&&Array.isArray(d.subjects))return {subjects:d.subjects,assignments:d.assignments||[],deleted:d.deleted||{}};
+  }catch(e){}
+  return {subjects:[],assignments:[],deleted:{}};
+}
+function persist(){localStorage.setItem(LS_KEY,JSON.stringify(S));}
+function save(){persist();renderAll();scheduleFolderSync();}
+function subjOf(id){return S.subjects.find(s=>s.id===id)||null;}
+function subjName(id){const s=subjOf(id);return s?s.name:'未分類';}
+function subjColor(id){const s=subjOf(id);return s?s.color:'#a8b3cf';}
+
+/* マージ (idベース・up新しい方優先・削除トゥームストーン) */
+function mergeData(d){
+  if(!d||typeof d!=='object')return 0;
+  let ch=0;
+  const del={...S.deleted};
+  for(const[k,v]of Object.entries(d.deleted||{})){if(!del[k]||v>del[k]){del[k]=v;ch++;}}
+  for(const key of['subjects','assignments']){
+    const map=new Map(S[key].map(x=>[x.id,x]));
+    for(const it of(d[key]||[])){
+      if(!it||!it.id)continue;
+      const cur=map.get(it.id);
+      if(!cur||(it.up||0)>(cur.up||0)){map.set(it.id,{...it});ch++;}
+    }
+    S[key]=[...map.values()].filter(x=>{const t=del[x.id];return !(t&&t>=(x.up||0));});
+  }
+  S.deleted=del;
+  return ch;
+}
+
+/* ===================== IndexedDB (ファイル) ===================== */
+let _dbp=null;
+function db(){
+  if(!_dbp)_dbp=new Promise((res,rej)=>{
+    const r=indexedDB.open('study-manager-db',1);
+    r.onupgradeneeded=()=>{const d=r.result;
+      if(!d.objectStoreNames.contains('files'))d.createObjectStore('files',{keyPath:'id'});
+      if(!d.objectStoreNames.contains('kv'))d.createObjectStore('kv');
+    };
+    r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);
+  });
+  return _dbp;
+}
+async function idbPut(rec){const d=await db();return new Promise((res,rej)=>{const t=d.transaction('files','readwrite');t.objectStore('files').put(rec);t.oncomplete=res;t.onerror=()=>rej(t.error);});}
+async function idbGet(id){const d=await db();return new Promise((res,rej)=>{const r=d.transaction('files').objectStore('files').get(id);r.onsuccess=()=>res(r.result||null);r.onerror=()=>rej(r.error);});}
+async function idbAll(){const d=await db();return new Promise((res,rej)=>{const r=d.transaction('files').objectStore('files').getAll();r.onsuccess=()=>res(r.result||[]);r.onerror=()=>rej(r.error);});}
+async function idbDel(id){const d=await db();return new Promise((res,rej)=>{const t=d.transaction('files','readwrite');t.objectStore('files').delete(id);t.oncomplete=res;t.onerror=()=>rej(t.error);});}
+async function kvSet(k,v){const d=await db();return new Promise((res,rej)=>{const t=d.transaction('kv','readwrite');t.objectStore('kv').put(v,k);t.oncomplete=res;t.onerror=()=>rej(t.error);});}
+async function kvGet(k){const d=await db();return new Promise((res,rej)=>{const r=d.transaction('kv').objectStore('kv').get(k);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});}
+async function kvDel(k){const d=await db();return new Promise((res,rej)=>{const t=d.transaction('kv','readwrite');t.objectStore('kv').delete(k);t.oncomplete=res;t.onerror=()=>rej(t.error);});}
+
+let FILES=[];
+const urlCache=new Map();
+function urlFor(f){if(!urlCache.has(f.id))urlCache.set(f.id,URL.createObjectURL(f.blob));return urlCache.get(f.id);}
+async function refreshFiles(){
+  const all=await idbAll();
+  FILES=[];
+  for(const f of all){
+    const t=S.deleted[f.id];
+    if(t&&t>=(f.up||0)){idbDel(f.id);if(urlCache.has(f.id)){URL.revokeObjectURL(urlCache.get(f.id));urlCache.delete(f.id);}continue;}
+    FILES.push(f);
+  }
+  FILES.sort((a,b)=>(b.date||'').localeCompare(a.date||'')||(b.up||0)-(a.up||0));
+}
+
+/* ===================== 画像の軽量化 ===================== */
+async function compressImage(file){
+  if(!/^image\//.test(file.type))return null;
+  try{
+    const bmp=await createImageBitmap(file);
+    const MAX=1800;
+    if(bmp.width<=MAX&&bmp.height<=MAX&&file.size<800*1024){bmp.close&&bmp.close();return null;}
+    const sc=Math.min(1,MAX/Math.max(bmp.width,bmp.height));
+    const c=document.createElement('canvas');
+    c.width=Math.round(bmp.width*sc);c.height=Math.round(bmp.height*sc);
+    c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
+    bmp.close&&bmp.close();
+    const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.85));
+    if(blob&&blob.size<file.size)return blob;
+  }catch(e){}
+  return null;
+}
+
+/* ===================== ノートファイル追加・削除 ===================== */
+async function addNoteFiles(fileList){
+  const date=el('n-date').value||today();
+  const subj=el('n-subj').value||null;
+  let n=0;
+  for(const f of fileList){
+    let blob=f,name=f.name||'ファイル',type=f.type||'application/octet-stream';
+    const c=await compressImage(f);
+    if(c){blob=c;type='image/jpeg';name=name.replace(/\.[^.]+$/,'')+'.jpg';}
+    await idbPut({id:uid(),name,type,size:blob.size,date,subjectId:subj,up:Date.now(),blob});
+    n++;
+  }
+  await refreshFiles();
+  save();
+  toast(`${n}件のファイルを保存しました`);
+}
+async function deleteFile(id){
+  const f=FILES.find(x=>x.id===id);
+  S.deleted[id]=Date.now();
+  await idbDel(id);
+  if(urlCache.has(id)){URL.revokeObjectURL(urlCache.get(id));urlCache.delete(id);}
+  if(f)removeFolderFile(f).catch(()=>{});
+  await refreshFiles();
+  save();
+}
+
+/* ===================== レンダリング ===================== */
+function renderAll(){renderSubjectSelects();renderTodo();renderAssignments();renderNotes();renderSubjects();renderSettings();}
+
+/* ===================== 今日のTODO ===================== */
+function todoItems(){
+  const withDue=S.assignments.filter(a=>!a.done&&a.due).sort((a,b)=>a.due.localeCompare(b.due));
+  const items=[];
+  for(const a of withDue){
+    const n=daysUntil(a.due);
+    if(n<0)items.push({a,pri:'最優先',cls:'ov',label:`${-n}日超過`});
+    else if(n===0)items.push({a,pri:'今日必須',cls:'today',label:'今日まで'});
+    else if(n===1)items.push({a,pri:'今日やる',cls:'soon',label:'明日まで'});
+    else if(n<=3)items.push({a,pri:'着手しておく',cls:'',label:`あと${n}日`});
+  }
+  if(items.length<3){
+    for(const a of withDue){
+      if(!items.some(i=>i.a.id===a.id)){items.push({a,pri:'余裕があれば',cls:'',label:`あと${daysUntil(a.due)}日`});break;}
+    }
+  }
+  return items.slice(0,8);
+}
+function renderTodo(){
+  el('todo-date').textContent=fmtJP(today());
+  const items=todoItems();
+  if(!items.length){
+    const open=S.assignments.filter(a=>!a.done).length;
+    el('todo-list').innerHTML=`<div class="empty">${open?'急ぎの課題はありません。余裕のある今のうちに進めておくのも◎':'今日のTODOはありません 🎉'}</div>`;
+    return;
+  }
+  el('todo-list').innerHTML=items.map((it,i)=>`<div class="titem" data-id="${it.a.id}">
+    <button class="chk" data-act="toggle" aria-label="完了切替">✓</button>
+    <span class="ttl"><span class="tsub" style="color:${subjColor(it.a.subjectId)}">[${esc(subjName(it.a.subjectId))}]</span>${esc(it.a.title)}</span>
+    <span class="dbadge ${it.cls}">${it.label}</span>
+    <span class="tpri ${it.cls}">${it.pri}</span>
+  </div>`).join('');
+}
+function buildTodoText(){
+  const items=todoItems();
+  const open=S.assignments.filter(a=>!a.done).sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999'));
+  let t=`【今日のTODO】${fmtJP(today())}\n`;
+  t+=items.length?items.map((it,i)=>`${i+1}. [${subjName(it.a.subjectId)}] ${it.a.title} — ${it.label}（${it.pri}）`).join('\n'):'急ぎの課題なし';
+  if(open.length)t+=`\n\n【未完了の課題ぜんぶ】\n`+open.map(a=>`- [${subjName(a.subjectId)}] ${a.title}（期限: ${a.due?`${fmtJP(a.due)}・${dueLabel(a.due)}`:'未設定'}）`).join('\n');
+  return t;
+}
+async function todoToClaude(){
+  const text=`今日の勉強計画を立てたいです。以下のTODOと課題を見て、優先順位とおすすめの進め方（時間配分の目安も）を教えてください。\n\n${buildTodoText()}`;
+  try{
+    if(navigator.share){await navigator.share({text});return;}
+  }catch(e){if(e&&e.name==='AbortError')return;}
+  window.open('https://claude.ai/new?q='+encodeURIComponent(text),'_blank');
+}
+async function copyTodo(){
+  try{await navigator.clipboard.writeText(buildTodoText());toast('TODOをコピーしました');}
+  catch(e){toast('コピーできませんでした');}
+}
+
+/* ===================== カレンダー書き出し (.ics) ===================== */
+function icsEscape(s){return String(s??'').replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\r?\n/g,'\\n');}
+function buildICS(){
+  const open=S.assignments.filter(a=>!a.done&&a.due);
+  if(!open.length)return null;
+  const stamp=new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d+/,'');
+  let ev='';
+  for(const a of open){
+    const d=a.due.replace(/-/g,'');
+    const title=`📚提出: [${subjName(a.subjectId)}] ${a.title}`;
+    ev+=[
+      'BEGIN:VEVENT',
+      `UID:${a.id}@study-manager`,
+      `DTSTAMP:${stamp}`,
+      `DTSTART:${d}T190000`,
+      `DTEND:${d}T193000`,
+      `SUMMARY:${icsEscape(title)}`,
+      a.memo?`DESCRIPTION:${icsEscape(a.memo)}`:null,
+      'BEGIN:VALARM','ACTION:DISPLAY',`DESCRIPTION:${icsEscape('明日提出: '+a.title)}`,'TRIGGER:-P1D','END:VALARM',
+      'BEGIN:VALARM','ACTION:DISPLAY',`DESCRIPTION:${icsEscape('今日提出: '+a.title)}`,'TRIGGER:-PT11H','END:VALARM',
+      'END:VEVENT'
+    ].filter(x=>x).join('\r\n')+'\r\n';
+  }
+  return `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//study-manager//JP\r\nCALSCALE:GREGORIAN\r\nMETHOD:PUBLISH\r\n${ev}END:VCALENDAR\r\n`;
+}
+async function exportICS(){
+  const ics=buildICS();
+  if(!ics){toast('期限つきの未完了課題がありません');return;}
+  const file=new File([ics],'学習課題の期限.ics',{type:'text/calendar'});
+  try{
+    if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file]});return;}
+  }catch(e){if(e&&e.name==='AbortError')return;}
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([ics],{type:'text/calendar'}));
+  a.download='学習課題の期限.ics';
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+  toast('カレンダーファイルを書き出しました。開くと登録できます');
+}
+
+function renderSubjectSelects(){
+  const opts=S.subjects.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('');
+  const keep=(sel,html)=>{const v=sel.value;sel.innerHTML=html;if([...sel.options].some(o=>o.value===v))sel.value=v;};
+  keep(el('a-subj'),`<option value="">未分類</option>`+opts);
+  keep(el('n-subj'),`<option value="">未分類</option>`+opts);
+  keep(el('f-subj'),`<option value="all">すべての教科</option>`+opts);
+  keep(el('fn-subj'),`<option value="all">すべての教科</option>`+opts);
+}
+
+function assignItemHTML(a){
+  const done=a.done?' done':'';
+  const due=a.due?`<span class="dbadge ${a.done?'':dueClass(a.due)}">${fmtJP(a.due)}・${a.done?'完了':dueLabel(a.due)}</span>`:'<span class="dbadge">期限なし</span>';
+  return `<div class="aitem${done}" data-id="${a.id}">
+    <button class="chk${a.done?' on':''}" data-act="toggle" aria-label="完了切替">✓</button>
+    <div class="amain">
+      <div class="atitle">${esc(a.title)}</div>
+      <div class="ameta"><span class="subtag"><span class="sdot" style="background:${subjColor(a.subjectId)}"></span>${esc(subjName(a.subjectId))}</span>${due}</div>
+      ${a.memo?`<div class="amemo">${esc(a.memo)}</div>`:''}
+    </div>
+    <div class="hacts"><button class="icon-btn" data-act="edit" aria-label="編集">✎</button><button class="icon-btn" data-act="del" aria-label="削除">🗑</button></div>
+  </div>`;
+}
+
+function renderAssignments(){
+  const filter=el('f-subj').value;
+  const all=S.assignments.filter(a=>filter==='all'||((a.subjectId||'')===filter));
+  const open=all.filter(a=>!a.done);
+  const done=all.filter(a=>a.done).sort((a,b)=>(b.up||0)-(a.up||0));
+  open.sort((a,b)=>{
+    if(!a.due&&!b.due)return (b.up||0)-(a.up||0);
+    if(!a.due)return 1;if(!b.due)return -1;
+    return a.due.localeCompare(b.due);
+  });
+  const over=open.filter(a=>a.due&&daysUntil(a.due)<0);
+  const todays=open.filter(a=>a.due&&daysUntil(a.due)===0);
+  const tomorrow=open.filter(a=>a.due&&daysUntil(a.due)===1);
+  const later=open.filter(a=>!over.includes(a)&&!todays.includes(a)&&!tomorrow.includes(a));
+  let html='';
+  if(over.length)html+=`<h3 class="gh red">⚠️ 期限切れ (${over.length})</h3><div class="alist">${over.map(assignItemHTML).join('')}</div>`;
+  if(todays.length)html+=`<h3 class="gh orange">🔥 今日まで (${todays.length})</h3><div class="alist">${todays.map(assignItemHTML).join('')}</div>`;
+  if(tomorrow.length)html+=`<h3 class="gh">⏰ 明日まで (${tomorrow.length})</h3><div class="alist">${tomorrow.map(assignItemHTML).join('')}</div>`;
+  if(later.length)html+=`<h3 class="gh">📅 今後 (${later.length})</h3><div class="alist">${later.map(assignItemHTML).join('')}</div>`;
+  if(!open.length)html+=`<div class="empty">未完了の課題はありません 🎉<br>上のフォームから課題を追加できます</div>`;
+  if(done.length)html+=`<details class="donewrap"><summary>✅ 完了済み (${done.length})</summary><div class="alist" style="margin-top:9px">${done.map(assignItemHTML).join('')}</div><div style="margin-top:9px"><button class="danger-btn" id="btn-clear-done">完了済みをすべて削除</button></div></details>`;
+  el('assign-list').innerHTML=html;
+  el('a-count').textContent=`未完了 ${open.length}件`;
+  const cd=el('btn-clear-done');
+  if(cd)cd.onclick=()=>{
+    if(!confirm(`完了済みの課題 ${done.length}件を削除しますか？`))return;
+    const now=Date.now();
+    for(const a of done)S.deleted[a.id]=now;
+    S.assignments=S.assignments.filter(a=>!a.done||!done.includes(a));
+    save();toast('完了済みを削除しました');
+  };
+  /* サマリー */
+  const allOpen=S.assignments.filter(a=>!a.done);
+  const nOver=allOpen.filter(a=>a.due&&daysUntil(a.due)<0).length;
+  const nToday=allOpen.filter(a=>a.due&&daysUntil(a.due)===0).length;
+  const nWeek=allOpen.filter(a=>a.due&&daysUntil(a.due)>=0&&daysUntil(a.due)<=7).length;
+  el('c-over').textContent=nOver;el('c-today').textContent=nToday;
+  el('c-week').textContent=nWeek;el('c-open').textContent=allOpen.length;
+  const badge=el('task-badge');
+  badge.textContent=allOpen.length;
+  badge.classList.toggle('calm',nOver===0&&nToday===0);
+  /* ホーム画面アプリのアイコンバッジ (iOS16.4+/Android) */
+  try{
+    if(navigator.setAppBadge){
+      const urgent=nOver+nToday;
+      urgent?navigator.setAppBadge(urgent):navigator.clearAppBadge();
+    }
+  }catch(e){}
+}
+
+function renderNotes(){
+  const filter=el('fn-subj').value;
+  const files=FILES.filter(f=>filter==='all'||((f.subjectId||'')===filter));
+  el('n-count').textContent=`${files.length}件`;
+  if(!files.length){el('notes-list').innerHTML='<div class="empty">まだノートがありません<br>上のボタンから写真やPDFを追加できます</div>';return;}
+  const byDate=new Map();
+  for(const f of files){if(!byDate.has(f.date))byDate.set(f.date,[]);byDate.get(f.date).push(f);}
+  let html='';
+  for(const[date,list]of byDate){
+    html+=`<div class="dgroup">
+      <div class="dghead"><span class="dt">${fmtJP(date)}</span><span class="cnt">${list.length}件</span>
+        <button class="claudebtn" data-date="${date}">🤖 Claudeに質問</button></div>
+      <div class="fgrid">${list.map(f=>{
+        const isImg=/^image\//.test(f.type);
+        const thumb=isImg?`<img class="fthumb" src="${urlFor(f)}" alt="" loading="lazy">`
+          :`<div class="fthumb icon">${f.type==='application/pdf'?'📄':'📎'}</div>`;
+        return `<div class="fitem" data-id="${f.id}">${thumb}
+          <div class="fsub" style="color:${subjColor(f.subjectId)}">${esc(subjName(f.subjectId))}</div>
+          <div class="fname">${esc(f.name)}</div></div>`;
+      }).join('')}</div>
+    </div>`;
+  }
+  el('notes-list').innerHTML=html;
+}
+
+function renderSubjects(){
+  el('s-count').textContent=`${S.subjects.length}教科`;
+  if(!S.subjects.length){el('subj-list').innerHTML='<div class="empty">教科がまだありません。上から追加するか、よく使う教科をタップでまとめて追加できます</div>';}
+  else{
+    el('subj-list').innerHTML=S.subjects.map(s=>{
+      const na=S.assignments.filter(a=>a.subjectId===s.id&&!a.done).length;
+      const nf=FILES.filter(f=>f.subjectId===s.id).length;
+      return `<div class="sitem" data-id="${s.id}">
+        <span class="sdot" style="background:${s.color}"></span>
+        <span class="sname">${esc(s.name)}</span>
+        <span class="scnt">課題${na}・ノート${nf}</span>
+        <button class="icon-btn" data-act="sdel" aria-label="削除">🗑</button>
+      </div>`;
+    }).join('');
+  }
+  /* クイック追加 */
+  const have=new Set(S.subjects.map(s=>s.name));
+  const rest=PRESET_SUBJECTS.filter(n=>!have.has(n));
+  el('s-quick').innerHTML=rest.length?`<span style="font-size:12px;color:var(--muted);align-self:center">よく使う教科:</span>`+rest.map(n=>`<button class="ghost" data-qadd="${esc(n)}">＋${esc(n)}</button>`).join(''):'';
+}
+
+function renderSettings(){
+  el('data-stat').textContent=`教科 ${S.subjects.length} ・ 課題 ${S.assignments.length} ・ ノートファイル ${FILES.length}件（合計 ${fmtSize(FILES.reduce((a,f)=>a+(f.size||0),0))}）`;
+  el('exp-size').textContent=FILES.length?`(約${fmtSize(Math.round(FILES.reduce((a,f)=>a+(f.size||0),0)*1.37))})`:'';
+  const st=el('folder-stat'),btn=el('btn-folder'),off=el('btn-folder-off'),hd=el('syncstat');
+  if(dirHandle){st.textContent=`連携中: ${dirHandle.name}`;btn.textContent='別のフォルダに変更';off.classList.remove('hidden');hd.textContent=`📂 ${dirHandle.name} と同期中`;hd.classList.add('on');}
+  else{st.textContent='';btn.textContent='フォルダを連携する';off.classList.add('hidden');hd.textContent=window.showDirectoryPicker?'フォルダ未連携':'';hd.classList.remove('on');}
+  if(!window.showDirectoryPicker){btn.disabled=true;st.textContent='（この端末のブラウザはフォルダ連携非対応。書き出し/読み込みで同期できます）';}
+}
+
+/* ===================== 課題 操作 ===================== */
+let editingId=null;
+function addOrUpdateAssignment(){
+  const title=el('a-title').value.trim();
+  if(!title){el('a-title').classList.add('error');el('a-title').focus();return;}
+  el('a-title').classList.remove('error');
+  const rec={
+    id:editingId||uid(),
+    subjectId:el('a-subj').value||null,
+    title,
+    due:el('a-due').value||null,
+    memo:el('a-memo').value.trim(),
+    done:editingId?(S.assignments.find(a=>a.id===editingId)?.done||false):false,
+    up:Date.now()
+  };
+  S.assignments=S.assignments.filter(a=>a.id!==rec.id);
+  S.assignments.push(rec);
+  cancelEdit();
+  save();
+  toast(editingId?'課題を更新しました':'課題を追加しました');
+}
+function startEdit(id){
+  const a=S.assignments.find(x=>x.id===id);if(!a)return;
+  editingId=id;
+  el('a-title').value=a.title;el('a-subj').value=a.subjectId||'';
+  el('a-due').value=a.due||'';el('a-memo').value=a.memo||'';
+  el('aform-title').textContent='課題を編集';
+  el('btn-add-assign').textContent='更新する';
+  el('btn-cancel-edit').classList.remove('hidden');
+  el('a-title').focus();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function cancelEdit(){
+  editingId=null;
+  el('a-title').value='';el('a-due').value='';el('a-memo').value='';
+  el('aform-title').textContent='課題を追加';
+  el('btn-add-assign').textContent='追加する';
+  el('btn-cancel-edit').classList.add('hidden');
+}
+
+/* ===================== 教科 操作 ===================== */
+let selColor=PALETTE[5];
+function renderSwatches(){
+  el('s-colors').innerHTML=PALETTE.map(c=>`<button class="sw${c===selColor?' sel':''}" style="background:${c}" data-c="${c}" aria-label="色"></button>`).join('');
+}
+function addSubject(name,color){
+  name=(name||'').trim();
+  if(!name){el('s-name').classList.add('error');return;}
+  el('s-name').classList.remove('error');
+  if(S.subjects.some(s=>s.name===name)){toast('同じ名前の教科があります');return;}
+  S.subjects.push({id:uid(),name,color:color||selColor,up:Date.now()});
+  el('s-name').value='';
+  save();
+  toast(`「${name}」を追加しました`);
+}
+function deleteSubject(id){
+  const s=subjOf(id);if(!s)return;
+  const na=S.assignments.filter(a=>a.subjectId===id).length;
+  const nf=FILES.filter(f=>f.subjectId===id).length;
+  let msg=`教科「${s.name}」を削除しますか？`;
+  if(na||nf)msg+=`\n（課題${na}件は一緒に削除、ノート${nf}件は「未分類」になります）`;
+  if(!confirm(msg))return;
+  const now=Date.now();
+  S.deleted[id]=now;
+  for(const a of S.assignments.filter(a=>a.subjectId===id))S.deleted[a.id]=now;
+  S.assignments=S.assignments.filter(a=>a.subjectId!==id);
+  S.subjects=S.subjects.filter(x=>x.id!==id);
+  (async()=>{
+    for(const f of FILES.filter(f=>f.subjectId===id)){f.subjectId=null;f.up=Date.now();await idbPut(f);}
+    await refreshFiles();save();
+  })();
+  toast('教科を削除しました');
+}
+
+/* ===================== プレビュー ===================== */
+let pvId=null;
+function openPreview(id){
+  const f=FILES.find(x=>x.id===id);if(!f)return;
+  pvId=id;
+  const isImg=/^image\//.test(f.type);
+  el('pv-body').innerHTML=isImg?`<img class="pvimg" src="${urlFor(f)}" alt="">`:`<div class="pvicon">${f.type==='application/pdf'?'📄':'📎'}</div>`;
+  el('pv-name').textContent=`${fmtJP(f.date)} ・ ${subjName(f.subjectId)} ・ ${f.name}（${fmtSize(f.size)}）`;
+  el('pv-modal').classList.add('open');
+}
+function closePreview(){el('pv-modal').classList.remove('open');pvId=null;}
+function downloadFile(f){
+  const a=document.createElement('a');
+  a.href=urlFor(f);a.download=f.name;
+  document.body.appendChild(a);a.click();a.remove();
+}
+
+/* ===================== Claudeに質問 ===================== */
+let clDate=null;
+function openClaude(date){
+  clDate=date;
+  el('cl-date').textContent=fmtJP(date);
+  const list=FILES.filter(f=>f.date===date);
+  el('cl-files').innerHTML=list.map(f=>`<label><input type="checkbox" checked value="${f.id}"><span class="nm">[${esc(subjName(f.subjectId))}] ${esc(f.name)}</span></label>`).join('')||'<div class="empty" style="padding:6px">この日のファイルはありません</div>';
+  el('cl-q').value='';
+  el('cl-tasks').checked=false;
+  const pcnote=el('cl-pcnote');
+  if(dirHandle){pcnote.classList.remove('hidden');pcnote.innerHTML=`💻 PCでは <span class="kbd">${esc(dirHandle.name)}/ノート/${esc(date)}/</span> にファイルが保存済みです。Claude Codeに「このフォルダのノートをまとめて」と頼めます。`;}
+  else pcnote.classList.add('hidden');
+  /* 共有が使えない環境では案内 */
+  el('cl-share').disabled=!navigator.share;
+  el('cl-modal').classList.add('open');
+}
+function closeClaude(){el('cl-modal').classList.remove('open');clDate=null;}
+function clSelectedFiles(){
+  const ids=[...el('cl-files').querySelectorAll('input:checked')].map(i=>i.value);
+  return FILES.filter(f=>ids.includes(f.id));
+}
+function buildPrompt(){
+  const files=clSelectedFiles();
+  const q=el('cl-q').value.trim()||'このノート・プリントの内容を要点ごとにわかりやすくまとめてください。';
+  const subjects=[...new Set(files.map(f=>subjName(f.subjectId)))].join('・');
+  let t=`${fmtJP(clDate)}の授業ノート・プリント${subjects?`（${subjects}）`:''}についてお願いします。\n\n${q}`;
+  if(files.length)t+=`\n\n【添付ファイル ${files.length}件】\n`+files.map(f=>`- [${subjName(f.subjectId)}] ${f.name}`).join('\n');
+  if(el('cl-tasks').checked){
+    const open=S.assignments.filter(a=>!a.done).sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999'));
+    if(open.length)t+=`\n\n【未完了の課題】\n`+open.map(a=>`- [${subjName(a.subjectId)}] ${a.title}（期限: ${a.due?`${fmtJP(a.due)}・${dueLabel(a.due)}`:'未設定'}）`).join('\n');
+  }
+  return t;
+}
+async function shareToClaude(){
+  const text=buildPrompt();
+  const files=clSelectedFiles().map(f=>new File([f.blob],f.name,{type:f.type}));
+  try{
+    if(files.length&&navigator.canShare&&navigator.canShare({files})){
+      await navigator.share({files,text});
+    }else if(navigator.share){
+      await navigator.share({text});
+      if(files.length)toast('この環境ではファイル共有非対応のため文章のみ共有しました');
+    }else{throw new Error('no-share');}
+  }catch(e){
+    if(e&&e.name==='AbortError')return;
+    copyPrompt();
+    toast('共有が使えないためコピーしました');
+  }
+}
+async function copyPrompt(){
+  const text=buildPrompt();
+  try{await navigator.clipboard.writeText(text);toast('質問文をコピーしました');}
+  catch(e){
+    const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();
+    try{document.execCommand('copy');toast('質問文をコピーしました');}catch(_){toast('コピーできませんでした');}
+    ta.remove();
+  }
+}
+function openClaudeWeb(){
+  window.open('https://claude.ai/new?q='+encodeURIComponent(buildPrompt()),'_blank');
+}
+
+/* ===================== フォルダ連携 (File System Access API) ===================== */
+let dirHandle=null,pendingHandle=null,syncTimer=null,lastAbsorb=0;
+function loadWritten(){try{return JSON.parse(localStorage.getItem(WRITTEN_KEY))||{};}catch(e){return{};}}
+function saveWritten(w){localStorage.setItem(WRITTEN_KEY,JSON.stringify(w));}
+function sanitizeName(n){return String(n).replace(/[\\/:*?"<>|]/g,'_').slice(0,120)||'file';}
+
+async function connectFolder(){
+  let h;
+  try{h=await window.showDirectoryPicker({mode:'readwrite'});}catch(e){return;}
+  dirHandle=h;pendingHandle=null;
+  await kvSet('dir',h);
+  el('reconnect-banner').style.display='none';
+  renderSettings();
+  await folderSync(true);
+  toast(`「${h.name}」と連携しました`);
+}
+async function disconnectFolder(){
+  dirHandle=null;pendingHandle=null;
+  await kvDel('dir');
+  localStorage.removeItem(WRITTEN_KEY);
+  renderSettings();
+  toast('フォルダ連携を解除しました');
+}
+async function restoreFolder(){
+  if(!window.showDirectoryPicker)return;
+  let h=null;
+  try{h=await kvGet('dir');}catch(e){}
+  if(!h)return;
+  try{
+    const p=await h.queryPermission({mode:'readwrite'});
+    if(p==='granted'){dirHandle=h;renderSettings();folderSync(true);}
+    else{pendingHandle=h;el('reconnect-banner').style.display='flex';}
+  }catch(e){}
+}
+async function reconnectFolder(){
+  if(!pendingHandle)return;
+  try{
+    const p=await pendingHandle.requestPermission({mode:'readwrite'});
+    if(p==='granted'){dirHandle=pendingHandle;pendingHandle=null;el('reconnect-banner').style.display='none';renderSettings();await folderSync(true);toast('フォルダに再接続しました');}
+  }catch(e){}
+}
+function scheduleFolderSync(){
+  if(!dirHandle)return;
+  clearTimeout(syncTimer);
+  syncTimer=setTimeout(()=>folderSync(false).catch(console.warn),800);
+}
+async function folderSync(absorb){
+  if(!dirHandle)return;
+  try{
+    if(absorb)await absorbFolderJSON();
+    /* データJSON書き出し（ファイル本体は実ファイルとして別に保存するのでメタのみ） */
+    const meta=FILES.map(f=>({id:f.id,name:f.name,type:f.type,size:f.size,date:f.date,subjectId:f.subjectId,up:f.up}));
+    const json=JSON.stringify({app:APP_TAG,ver:1,exportedAt:new Date().toISOString(),subjects:S.subjects,assignments:S.assignments,deleted:S.deleted,files:meta},null,1);
+    const fh=await dirHandle.getFileHandle('学習データ.json',{create:true});
+    const w=await fh.createWritable();await w.write(json);await w.close();
+    await writeNoteFiles();
+  }catch(e){console.warn('folderSync',e);}
+}
+async function absorbFolderJSON(){
+  let changed=0;
+  for await(const[name,handle]of dirHandle.entries()){
+    if(handle.kind!=='file'||!/\.json$/i.test(name))continue;
+    try{
+      const file=await handle.getFile();
+      if(file.size>200*1024*1024)continue;
+      const d=JSON.parse(await file.text());
+      if(d&&d.app===APP_TAG){
+        changed+=mergeData(d);
+        changed+=await mergeFiles(d.files);
+      }
+    }catch(e){}
+  }
+  if(changed){await refreshFiles();persist();renderAll();toast('フォルダから取り込みました');}
+}
+async function writeNoteFiles(){
+  const written=loadWritten();
+  const notes=await dirHandle.getDirectoryHandle('ノート',{create:true});
+  const usedNames={};
+  for(const f of FILES){
+    const dateDir=f.date||'日付なし';
+    let dir;
+    try{dir=await notes.getDirectoryHandle(dateDir,{create:true});}catch(e){continue;}
+    let fname=written[f.id];
+    if(!fname){
+      const base=sanitizeName(`${subjName(f.subjectId)}_${f.name}`);
+      fname=base;let i=2;
+      const taken=new Set(Object.values(written));
+      while(taken.has(`${dateDir}/${fname}`)){const m=base.match(/^(.*?)(\.[^.]*)?$/);fname=`${m[1]}(${i})${m[2]||''}`;i++;}
+    }else{fname=fname.split('/').pop();}
+    usedNames[f.id]=`${dateDir}/${fname}`;
+    let exists=false;
+    try{await dir.getFileHandle(fname,{create:false});exists=true;}catch(e){}
+    if(!exists){
+      try{
+        const fh=await dir.getFileHandle(fname,{create:true});
+        const w=await fh.createWritable();await w.write(f.blob);await w.close();
+      }catch(e){continue;}
+    }
+    written[f.id]=`${dateDir}/${fname}`;
+  }
+  saveWritten(written);
+}
+async function removeFolderFile(f){
+  if(!dirHandle)return;
+  const written=loadWritten();
+  const path=written[f.id];
+  if(!path)return;
+  try{
+    const[dateDir,fname]=[path.split('/')[0],path.split('/').slice(1).join('/')];
+    const notes=await dirHandle.getDirectoryHandle('ノート',{create:false});
+    const dir=await notes.getDirectoryHandle(dateDir,{create:false});
+    await dir.removeEntry(fname);
+  }catch(e){}
+  delete written[f.id];
+  saveWritten(written);
+}
+
+/* ===================== 書き出し・読み込み ===================== */
+function blobToDataURL(blob){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(r.error);r.readAsDataURL(blob);});}
+function dataURLtoBlob(u){
+  const[h,b]=u.split(',');
+  const mime=(h.match(/data:(.*?);/)||[])[1]||'application/octet-stream';
+  const bin=atob(b);const arr=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);
+  return new Blob([arr],{type:mime});
+}
+async function buildExport(includeFiles){
+  const o={app:APP_TAG,ver:1,exportedAt:new Date().toISOString(),subjects:S.subjects,assignments:S.assignments,deleted:S.deleted};
+  o.files=[];
+  for(const f of FILES){
+    const m={id:f.id,name:f.name,type:f.type,size:f.size,date:f.date,subjectId:f.subjectId,up:f.up};
+    if(includeFiles)m.data=await blobToDataURL(f.blob);
+    o.files.push(m);
+  }
+  return JSON.stringify(o);
+}
+async function mergeFiles(arr){
+  if(!Array.isArray(arr))return 0;
+  let n=0;
+  for(const m of arr){
+    if(!m||!m.id)continue;
+    const t=S.deleted[m.id];
+    if(t&&t>=(m.up||0))continue;
+    const cur=await idbGet(m.id);
+    if(cur&&(cur.up||0)>=(m.up||0))continue;
+    if(m.data){
+      const blob=dataURLtoBlob(m.data);
+      await idbPut({id:m.id,name:m.name||'ファイル',type:m.type||blob.type,size:blob.size,date:m.date||today(),subjectId:m.subjectId||null,up:m.up||Date.now(),blob});
+      n++;
+    }else if(cur){
+      await idbPut({...cur,name:m.name||cur.name,date:m.date||cur.date,subjectId:m.subjectId!==undefined?m.subjectId:cur.subjectId,up:m.up||cur.up});
+      n++;
+    }
+  }
+  return n;
+}
+async function exportShare(){
+  toast('書き出し中…');
+  const json=await buildExport(el('exp-files').checked);
+  const file=new File([json],`学習管理データ.json`,{type:'application/json'});
+  try{
+    if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file]});return;}
+  }catch(e){if(e&&e.name==='AbortError')return;}
+  exportDownload(json);
+}
+async function exportDownload(json){
+  json=typeof json==='string'?json:await buildExport(el('exp-files').checked);
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([json],{type:'application/json'}));
+  a.download='学習管理データ.json';
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+  toast('ダウンロードしました');
+}
+async function importFile(file){
+  try{
+    const d=JSON.parse(await file.text());
+    if(d.app!==APP_TAG&&!confirm('このアプリの書き出しデータではないようです。読み込みますか？'))return;
+    const c1=mergeData(d);
+    const c2=await mergeFiles(d.files);
+    await refreshFiles();
+    save();
+    toast(c1+c2?`読み込みました（${c1+c2}件更新）`:'新しいデータはありませんでした');
+  }catch(e){toast('読み込みに失敗しました');console.warn(e);}
+}
+
+/* ===================== イベント ===================== */
+function bindEvents(){
+  /* タブ */
+  document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===t));
+    for(const p of['tasks','notes','subjects','settings'])el('panel-'+p).classList.toggle('hidden',p!==t.dataset.tab);
+  }));
+  /* 今日のTODO */
+  el('btn-todo-claude').addEventListener('click',todoToClaude);
+  el('btn-todo-copy').addEventListener('click',copyTodo);
+  el('btn-ics').addEventListener('click',exportICS);
+  el('todo-list').addEventListener('click',e=>{
+    const btn=e.target.closest('[data-act="toggle"]');if(!btn)return;
+    const id=btn.closest('.titem')?.dataset.id;
+    const a=S.assignments.find(x=>x.id===id);if(!a)return;
+    a.done=true;a.up=Date.now();save();toast('完了にしました');
+  });
+  /* 課題 */
+  el('btn-add-assign').addEventListener('click',addOrUpdateAssignment);
+  el('btn-cancel-edit').addEventListener('click',cancelEdit);
+  el('a-title').addEventListener('keydown',e=>{if(e.key==='Enter')addOrUpdateAssignment();});
+  el('f-subj').addEventListener('change',renderAssignments);
+  el('assign-list').addEventListener('click',e=>{
+    const btn=e.target.closest('[data-act]');if(!btn)return;
+    const id=btn.closest('.aitem')?.dataset.id;if(!id)return;
+    const act=btn.dataset.act;
+    if(act==='toggle'){
+      const a=S.assignments.find(x=>x.id===id);if(!a)return;
+      a.done=!a.done;a.up=Date.now();save();
+    }else if(act==='edit')startEdit(id);
+    else if(act==='del'){
+      const a=S.assignments.find(x=>x.id===id);if(!a)return;
+      if(!confirm(`「${a.title}」を削除しますか？`))return;
+      S.deleted[id]=Date.now();
+      S.assignments=S.assignments.filter(x=>x.id!==id);
+      save();toast('削除しました');
+    }
+  });
+  /* ノート */
+  el('n-files').addEventListener('change',e=>{
+    if(e.target.files.length)addNoteFiles([...e.target.files]).catch(err=>{console.warn(err);toast('保存に失敗しました');});
+    e.target.value='';
+  });
+  el('fn-subj').addEventListener('change',renderNotes);
+  el('notes-list').addEventListener('click',e=>{
+    const cb=e.target.closest('.claudebtn');
+    if(cb){openClaude(cb.dataset.date);return;}
+    const fi=e.target.closest('.fitem');
+    if(fi)openPreview(fi.dataset.id);
+  });
+  /* プレビュー */
+  el('pv-close').addEventListener('click',closePreview);
+  el('pv-modal').addEventListener('click',e=>{if(e.target===el('pv-modal'))closePreview();});
+  el('pv-open').addEventListener('click',()=>{const f=FILES.find(x=>x.id===pvId);if(f)window.open(urlFor(f),'_blank');});
+  el('pv-dl').addEventListener('click',()=>{const f=FILES.find(x=>x.id===pvId);if(f)downloadFile(f);});
+  el('pv-del').addEventListener('click',async()=>{
+    const f=FILES.find(x=>x.id===pvId);if(!f)return;
+    if(!confirm(`「${f.name}」を削除しますか？`))return;
+    await deleteFile(pvId);closePreview();toast('削除しました');
+  });
+  /* 教科 */
+  renderSwatches();
+  el('s-colors').addEventListener('click',e=>{
+    const b=e.target.closest('.sw');if(!b)return;
+    selColor=b.dataset.c;renderSwatches();
+  });
+  el('btn-add-subj').addEventListener('click',()=>addSubject(el('s-name').value));
+  el('s-name').addEventListener('keydown',e=>{if(e.key==='Enter')addSubject(el('s-name').value);});
+  el('s-quick').addEventListener('click',e=>{
+    const b=e.target.closest('[data-qadd]');if(!b)return;
+    const used=new Set(S.subjects.map(s=>s.color));
+    const c=PALETTE.find(c=>!used.has(c))||PALETTE[S.subjects.length%PALETTE.length];
+    addSubject(b.dataset.qadd,c);
+  });
+  el('subj-list').addEventListener('click',e=>{
+    const b=e.target.closest('[data-act="sdel"]');if(!b)return;
+    deleteSubject(b.closest('.sitem').dataset.id);
+  });
+  /* Claude */
+  el('cl-close').addEventListener('click',closeClaude);
+  el('cl-modal').addEventListener('click',e=>{if(e.target===el('cl-modal'))closeClaude();});
+  el('cl-modal').querySelectorAll('.presets .mini').forEach(b=>b.addEventListener('click',()=>{el('cl-q').value=b.dataset.q;}));
+  el('cl-share').addEventListener('click',shareToClaude);
+  el('cl-copy').addEventListener('click',copyPrompt);
+  el('cl-open').addEventListener('click',openClaudeWeb);
+  /* 設定 */
+  el('btn-folder').addEventListener('click',connectFolder);
+  el('btn-folder-off').addEventListener('click',disconnectFolder);
+  el('btn-reconnect').addEventListener('click',reconnectFolder);
+  el('btn-export-share').addEventListener('click',exportShare);
+  el('btn-export-dl').addEventListener('click',()=>exportDownload());
+  el('imp-file').addEventListener('change',e=>{
+    if(e.target.files[0])importFile(e.target.files[0]);
+    e.target.value='';
+  });
+  el('btn-wipe').addEventListener('click',async()=>{
+    if(!confirm('すべてのデータ（教科・課題・ノートファイル）を削除します。よろしいですか？'))return;
+    if(!confirm('本当に削除しますか？この操作は取り消せません。'))return;
+    const now=Date.now();
+    for(const x of[...S.subjects,...S.assignments])S.deleted[x.id]=now;
+    for(const f of FILES)S.deleted[f.id]=now;
+    S.subjects=[];S.assignments=[];
+    for(const f of FILES)await idbDel(f.id);
+    await refreshFiles();
+    save();
+    toast('すべて削除しました');
+  });
+  /* フォーカス時にフォルダ取り込み */
+  window.addEventListener('focus',()=>{
+    if(dirHandle&&Date.now()-lastAbsorb>15000){lastAbsorb=Date.now();folderSync(true).catch(()=>{});}
+  });
+}
+
+/* ===================== 起動 ===================== */
+(async function init(){
+  el('n-date').value=today();
+  bindEvents();
+  await refreshFiles().catch(e=>console.warn(e));
+  renderAll();
+  restoreFolder();
+  /* 公開サイト(https)ではオフライン対応のService Workerを登録 */
+  if('serviceWorker' in navigator&&location.protocol==='https:'){
+    navigator.serviceWorker.register('study-sw.js').catch(()=>{});
+  }
+})();
+</script>
+</body>
+</html>
