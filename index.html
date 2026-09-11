@@ -186,6 +186,15 @@ details.donewrap summary{cursor:pointer;color:var(--muted);font-size:13px;font-w
 .ritem .rmeta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px;font-size:12px;color:var(--muted)}
 .okbadge{font-size:11px;padding:1px 9px;border-radius:999px;font-weight:700;border:1px solid rgba(61,220,132,.5);color:var(--ok);background:rgba(61,220,132,.1)}
 .nobadge{font-size:11px;padding:1px 9px;border-radius:999px;font-weight:700;border:1px solid #3a4060;color:var(--muted)}
+.ritem .rhit{font-size:12.5px;color:#cdd1e2;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.05);padding:5px 9px;border-radius:8px;margin-top:6px;word-break:break-word}
+details.notesum{margin:0 0 10px}
+details.notesum summary{cursor:pointer;color:var(--accent);font-size:13px;font-weight:700;user-select:none}
+details.notesum .sumbody{margin-top:9px;background:var(--panel2);border:1px solid var(--border);border-radius:11px;padding:12px}
+table.tt{border-collapse:collapse;width:100%;font-size:12.5px}
+table.tt th,table.tt td{border:1px solid var(--border);padding:3px;text-align:center}
+table.tt th{color:var(--muted);font-weight:700;background:var(--panel2);white-space:nowrap}
+.tt-cell{width:100%;background:transparent;border:1px solid;border-radius:7px;padding:5px 4px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;touch-action:manipulation}
+.tt-empty{color:#3a4060}
 .sumbody{font-size:14.5px;line-height:1.75;word-break:break-word}
 .sumbody h4{font-size:13.5px;margin:14px 0 5px;color:var(--accent)}
 .sumbody h4:first-child{margin-top:0}
@@ -295,6 +304,7 @@ details.donewrap summary{cursor:pointer;color:var(--muted);font-size:13px;font-w
   <!-- ============ 授業録音 ============ -->
   <section id="panel-voice" class="hidden">
     <div class="alertbox err hidden" id="v-support"></div>
+    <div class="alertbox warn hidden" id="v-draft"></div>
 
     <div class="card">
       <h2>🎙️ 授業を録音する</h2>
@@ -321,6 +331,7 @@ details.donewrap summary{cursor:pointer;color:var(--muted);font-size:13px;font-w
       <h2>録音した授業 <span class="countb" id="v-listcount"></span></h2>
       <div class="filters">
         <select id="fv-subj"><option value="all">すべての教科</option></select>
+        <input type="search" id="v-search" placeholder="タイトル・文字起こし・要約を検索" autocomplete="off" style="flex:1;min-width:200px">
       </div>
       <div id="v-list"></div>
     </div>
@@ -341,6 +352,21 @@ details.donewrap summary{cursor:pointer;color:var(--muted);font-size:13px;font-w
     <div class="card">
       <h2>教科一覧 <span class="countb" id="s-count"></span></h2>
       <div class="slist" id="subj-list"></div>
+    </div>
+    <div class="card">
+      <h2>🗓️ 時間割 <span class="countb" id="tt-count"></span></h2>
+      <div class="mnote" style="margin:0 0 12px">登録しておくと、録音タブの教科が今の時間から自動で選ばれます。</div>
+      <div class="frow c3">
+        <div><label>曜日</label><select id="tt-day"></select></div>
+        <div><label>時限</label><select id="tt-period"></select></div>
+        <div><label>教科</label><select id="tt-subj"></select></div>
+      </div>
+      <button class="accentbtn" id="tt-add" style="width:100%">この枠に登録</button>
+      <div id="tt-grid" style="margin-top:16px"></div>
+      <details style="margin-top:14px">
+        <summary style="cursor:pointer;color:var(--muted);font-size:13px;font-weight:700">時限の開始・終了時刻を変える</summary>
+        <div id="tt-times" style="margin-top:10px"></div>
+      </details>
     </div>
   </section>
 
@@ -385,6 +411,7 @@ details.donewrap summary{cursor:pointer;color:var(--muted);font-size:13px;font-w
       </div>
       <div class="mnote" id="k-status" style="margin:0"></div>
       <div class="mnote" id="k-cost"></div>
+      <div class="mnote" id="k-usage" style="padding-top:8px;border-top:1px solid var(--border);margin-top:10px"></div>
     </div>
 
     <div class="card">
@@ -412,6 +439,7 @@ details.donewrap summary{cursor:pointer;color:var(--muted);font-size:13px;font-w
     <div class="card">
       <h2>🔄 書き出し・読み込み（スマホ⇔PC同期）</h2>
       <div class="optrow"><input type="checkbox" id="exp-files" checked><label for="exp-files" style="margin:0;font-size:13px;color:var(--text)">ノートのファイルも含める <span id="exp-size" style="color:var(--muted)"></span></label></div>
+      <div class="optrow"><input type="checkbox" id="exp-text"><label for="exp-text" style="margin:0;font-size:13px;color:var(--text)">授業の文字起こしも含める <span id="exp-tsize" style="color:var(--muted)"></span></label></div>
       <div class="setrow">
         <button class="accentbtn" id="btn-export-share">📤 共有で書き出し</button>
         <button class="ghost" id="btn-export-dl">ダウンロード</button>
@@ -457,9 +485,13 @@ details.donewrap summary{cursor:pointer;color:var(--muted);font-size:13px;font-w
     </div>
     <textarea id="cl-q" rows="4" placeholder="質問を入力（上のボタンでも入力できます）"></textarea>
     <div class="optrow"><input type="checkbox" id="cl-tasks"><label for="cl-tasks" style="margin:0;font-size:13px;color:var(--text)">未完了の課題リストも一緒に送る</label></div>
+    <div class="optrow"><input type="checkbox" id="cl-rec" checked><label for="cl-rec" style="margin:0;font-size:13px;color:var(--text)">この日の授業録音も使う <span id="cl-recnote" style="color:var(--muted)"></span></label></div>
     <div class="mnote hidden" id="cl-pcnote"></div>
+    <div class="sumbody hidden" id="cl-result" style="background:var(--panel2);border:1px solid var(--border);border-radius:11px;padding:12px;margin-bottom:10px"></div>
+    <div class="mnote" id="cl-status"></div>
     <div class="mbtns">
-      <button class="accentbtn" id="cl-share">📤 共有する（ファイル付き）</button>
+      <button class="accentbtn" id="cl-sum">✨ アプリ内で要約する</button>
+      <button class="claudebtn2" id="cl-share">📤 Claudeアプリへ送る</button>
       <button class="mini" id="cl-open">Claudeで開く（文章のみ）</button>
       <button class="mini" id="cl-copy">コピー</button>
       <button class="mini" id="cl-close">閉じる</button>
@@ -488,17 +520,44 @@ details.donewrap summary{cursor:pointer;color:var(--muted);font-size:13px;font-w
     </div>
     <div class="mnote" id="rec-status"></div>
     <div class="pbar hidden" id="rec-bar"><i style="width:0%"></i></div>
+    <div id="rec-tasks"></div>
 
     <details style="margin-top:14px">
-      <summary style="cursor:pointer;color:var(--muted);font-size:13px;font-weight:700">文字起こしを見る・直す</summary>
-      <textarea id="rec-text" rows="9" style="margin-top:9px"></textarea>
-      <div class="mnote" id="rec-textcount"></div>
+      <summary style="cursor:pointer;color:var(--muted);font-size:13px;font-weight:700">文字起こしを見る</summary>
+      <textarea id="rec-text" rows="9" style="margin-top:9px" readonly></textarea>
+      <div class="setrow" style="margin-top:8px">
+        <button class="mini" id="rec-edit">✎ 直す（検索・置換つき）</button>
+        <span class="mnote" id="rec-textcount" style="margin:0"></span>
+      </div>
     </details>
 
     <div class="mbtns" style="margin-top:14px">
       <button class="mini save" id="rec-save">保存して閉じる</button>
       <button class="danger-btn" id="rec-del">削除</button>
       <button class="mini" id="rec-close">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<!-- 文字起こしの編集 -->
+<div class="overlay" id="ed-modal">
+  <div class="modal" style="max-width:760px">
+    <h3 id="ed-head">文字起こしを直す</h3>
+    <div class="frow c3">
+      <div class="span2"><label>探す</label><input type="text" id="ed-find" placeholder="誤認識された語"></div>
+      <div><label>置き換える</label><input type="text" id="ed-repl" placeholder="正しい語"></div>
+    </div>
+    <div class="setrow">
+      <button class="mini" id="ed-next">次を探す</button>
+      <button class="mini" id="ed-one">1件置換</button>
+      <button class="mini save" id="ed-all">すべて置換</button>
+      <span class="mnote" id="ed-hits" style="margin:0"></span>
+    </div>
+    <textarea id="ed-text" rows="18" style="margin-top:10px;font-size:15px;line-height:1.8"></textarea>
+    <div class="mnote" id="ed-count"></div>
+    <div class="mbtns">
+      <button class="mini save" id="ed-save">保存して閉じる</button>
+      <button class="mini" id="ed-cancel">取り消して閉じる</button>
     </div>
   </div>
 </div>
@@ -511,7 +570,8 @@ details.donewrap summary{cursor:pointer;color:var(--muted);font-size:13px;font-w
     <div class="mnote" id="dg-status"></div>
     <div class="pbar hidden" id="dg-bar"><i style="width:0%"></i></div>
     <div class="mbtns">
-      <button class="accentbtn" id="dg-run">✨ まとめを作り直す</button>
+      <button class="accentbtn" id="dg-run">✨ まとめを作る</button>
+      <button class="mini hidden" id="dg-full">全部作り直す</button>
       <button class="mini" id="dg-copy">コピー</button>
       <button class="claudebtn2" id="dg-share">📤 共有</button>
       <button class="mini" id="dg-close">閉じる</button>
@@ -546,11 +606,40 @@ function toast(msg){const t=el('toast');t.textContent=msg;t.classList.add('show'
 let S=loadState();
 function loadState(){
   try{const d=JSON.parse(localStorage.getItem(LS_KEY));
-    if(d&&Array.isArray(d.subjects))return {subjects:d.subjects,assignments:d.assignments||[],recordings:d.recordings||[],digests:d.digests||[],deleted:d.deleted||{}};
+    if(d&&Array.isArray(d.subjects))return {subjects:d.subjects,assignments:d.assignments||[],recordings:d.recordings||[],digests:d.digests||[],timetable:d.timetable||[],noteSummaries:d.noteSummaries||[],deleted:d.deleted||{}};
   }catch(e){}
-  return {subjects:[],assignments:[],recordings:[],digests:[],deleted:{}};
+  return {subjects:[],assignments:[],recordings:[],digests:[],timetable:[],noteSummaries:[],deleted:{}};
 }
-function persist(){localStorage.setItem(LS_KEY,JSON.stringify(S));}
+
+/* 旧版は文字起こしを localStorage に入れていた。初回起動で IndexedDB へ移す */
+async function migrateBodies(){
+  const old=S.recordings.filter(r=>typeof r.transcript==='string'||typeof r.summary==='string');
+  if(!old.length)return 0;
+  for(const r of old){
+    const transcript=r.transcript||'',summary=r.summary||'';
+    try{await bodySet(r.id,{transcript,summary});}catch(e){continue;}
+    r.chars=transcript.length;
+    r.hasSummary=!!summary;
+    delete r.transcript;delete r.summary;
+  }
+  persist();
+  return old.length;
+}
+/* 保存に失敗しても画面更新は止めない。容量超過は黙って落とさず知らせる */
+let quotaWarned=false;
+function persist(){
+  try{
+    localStorage.setItem(LS_KEY,JSON.stringify(S));
+    return true;
+  }catch(e){
+    console.warn('persist',e);
+    if(!quotaWarned){
+      quotaWarned=true;
+      toast('保存できませんでした。設定タブの「データ」から書き出して、古い録音を減らしてください');
+    }
+    return false;
+  }
+}
 function save(){persist();renderAll();scheduleFolderSync();}
 function subjOf(id){return S.subjects.find(s=>s.id===id)||null;}
 function subjName(id){const s=subjOf(id);return s?s.name:'未分類';}
@@ -562,7 +651,7 @@ function mergeData(d){
   let ch=0;
   const del={...S.deleted};
   for(const[k,v]of Object.entries(d.deleted||{})){if(!del[k]||v>del[k]){del[k]=v;ch++;}}
-  for(const key of['subjects','assignments','recordings','digests']){
+  for(const key of['subjects','assignments','recordings','digests','timetable','noteSummaries']){
     if(!Array.isArray(S[key]))S[key]=[];
     const map=new Map(S[key].map(x=>[x.id,x]));
     for(const it of(d[key]||[])){
@@ -580,10 +669,12 @@ function mergeData(d){
 let _dbp=null;
 function db(){
   if(!_dbp)_dbp=new Promise((res,rej)=>{
-    const r=indexedDB.open('study-manager-db',1);
+    const r=indexedDB.open('study-manager-db',2);
     r.onupgradeneeded=()=>{const d=r.result;
       if(!d.objectStoreNames.contains('files'))d.createObjectStore('files',{keyPath:'id'});
       if(!d.objectStoreNames.contains('kv'))d.createObjectStore('kv');
+      /* 文字起こし・要約の本文（localStorage を圧迫するため別置き） */
+      if(!d.objectStoreNames.contains('bodies'))d.createObjectStore('bodies',{keyPath:'id'});
     };
     r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);
   });
@@ -593,6 +684,49 @@ async function idbPut(rec){const d=await db();return new Promise((res,rej)=>{con
 async function idbGet(id){const d=await db();return new Promise((res,rej)=>{const r=d.transaction('files').objectStore('files').get(id);r.onsuccess=()=>res(r.result||null);r.onerror=()=>rej(r.error);});}
 async function idbAll(){const d=await db();return new Promise((res,rej)=>{const r=d.transaction('files').objectStore('files').getAll();r.onsuccess=()=>res(r.result||[]);r.onerror=()=>rej(r.error);});}
 async function idbDel(id){const d=await db();return new Promise((res,rej)=>{const t=d.transaction('files','readwrite');t.objectStore('files').delete(id);t.oncomplete=res;t.onerror=()=>rej(t.error);});}
+/* ---- 文字起こし・要約の本文 ---- */
+const BODY=new Map();   /* 読み込み済み本文のキャッシュ */
+async function bodyGet(id){
+  if(BODY.has(id))return BODY.get(id);
+  const d=await db();
+  const rec=await new Promise((res,rej)=>{
+    const r=d.transaction('bodies').objectStore('bodies').get(id);
+    r.onsuccess=()=>res(r.result||null);r.onerror=()=>rej(r.error);
+  });
+  const b={transcript:(rec&&rec.transcript)||'',summary:(rec&&rec.summary)||''};
+  BODY.set(id,b);
+  return b;
+}
+async function bodySet(id,patch){
+  const cur=await bodyGet(id);
+  const b={transcript:patch.transcript!==undefined?patch.transcript:cur.transcript,
+           summary:patch.summary!==undefined?patch.summary:cur.summary};
+  const d=await db();
+  await new Promise((res,rej)=>{
+    const t=d.transaction('bodies','readwrite');
+    t.objectStore('bodies').put({id,transcript:b.transcript,summary:b.summary,up:Date.now()});
+    t.oncomplete=res;t.onerror=()=>rej(t.error);
+  });
+  BODY.set(id,b);
+  return b;
+}
+async function bodyDel(id){
+  BODY.delete(id);
+  const d=await db();
+  return new Promise((res,rej)=>{
+    const t=d.transaction('bodies','readwrite');
+    t.objectStore('bodies').delete(id);
+    t.oncomplete=res;t.onerror=()=>rej(t.error);
+  });
+}
+async function bodyAll(){
+  const d=await db();
+  return new Promise((res,rej)=>{
+    const r=d.transaction('bodies').objectStore('bodies').getAll();
+    r.onsuccess=()=>res(r.result||[]);r.onerror=()=>rej(r.error);
+  });
+}
+
 async function kvSet(k,v){const d=await db();return new Promise((res,rej)=>{const t=d.transaction('kv','readwrite');t.objectStore('kv').put(v,k);t.oncomplete=res;t.onerror=()=>rej(t.error);});}
 async function kvGet(k){const d=await db();return new Promise((res,rej)=>{const r=d.transaction('kv').objectStore('kv').get(k);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});}
 async function kvDel(k){const d=await db();return new Promise((res,rej)=>{const t=d.transaction('kv','readwrite');t.objectStore('kv').delete(k);t.oncomplete=res;t.onerror=()=>rej(t.error);});}
@@ -655,8 +789,15 @@ async function deleteFile(id){
   save();
 }
 
+/* ===================== 画面切り替え ===================== */
+function setTab(name){
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===name));
+  for(const p of['tasks','notes','voice','subjects','settings'])el('panel-'+p).classList.toggle('hidden',p!==name);
+  if(name==='voice')applyCurrentSlot();
+}
+
 /* ===================== レンダリング ===================== */
-function renderAll(){renderSubjectSelects();renderTodo();renderAssignments();renderNotes();renderVoice();renderSubjects();renderSettings();}
+function renderAll(){renderSubjectSelects();renderTodo();renderAssignments();renderNotes();renderVoice();renderSubjects();renderTimetable();renderSettings();}
 
 /* ===================== 今日のTODO ===================== */
 function todoItems(){
@@ -836,9 +977,12 @@ function renderNotes(){
   for(const f of files){if(!byDate.has(f.date))byDate.set(f.date,[]);byDate.get(f.date).push(f);}
   let html='';
   for(const[date,list]of byDate){
+    const ns=noteSummaryOf(date);
     html+=`<div class="dgroup">
       <div class="dghead"><span class="dt">${fmtJP(date)}</span><span class="cnt">${list.length}件</span>
-        <button class="claudebtn" data-date="${date}">🤖 Claudeに質問</button></div>
+        ${ns?'<span class="okbadge">要約済み</span>':''}
+        <button class="claudebtn" data-date="${date}">🤖 Claudeで要約・質問</button></div>
+      ${ns?`<details class="notesum"><summary>✨ この日のまとめを見る</summary><div class="sumbody">${mdToHtml(ns.text)}</div></details>`:''}
       <div class="fgrid">${list.map(f=>{
         const isImg=/^image\//.test(f.type);
         const thumb=isImg?`<img class="fthumb" src="${urlFor(f)}" alt="" loading="lazy">`
@@ -875,8 +1019,11 @@ function renderSubjects(){
 }
 
 function renderSettings(){
-  el('data-stat').textContent=`教科 ${S.subjects.length} ・ 課題 ${S.assignments.length} ・ ノートファイル ${FILES.length}件（合計 ${fmtSize(FILES.reduce((a,f)=>a+(f.size||0),0))}） ・ 授業録音 ${S.recordings.length}件（要約済み ${S.recordings.filter(r=>r.summary).length}）`;
+  el('data-stat').textContent=`教科 ${S.subjects.length} ・ 課題 ${S.assignments.length} ・ ノートファイル ${FILES.length}件（合計 ${fmtSize(FILES.reduce((a,f)=>a+(f.size||0),0))}） ・ 授業録音 ${S.recordings.length}件（要約済み ${S.recordings.filter(r=>r.hasSummary).length}）`;
+  renderCost();
   el('exp-size').textContent=FILES.length?`(約${fmtSize(Math.round(FILES.reduce((a,f)=>a+(f.size||0),0)*1.37))})`:'';
+  const tchars=S.recordings.reduce((a,r)=>a+(r.chars||0),0);
+  el('exp-tsize').textContent=tchars?`(約${fmtSize(tchars*3)}。要約だけなら不要です)`:'';
   const st=el('folder-stat'),btn=el('btn-folder'),off=el('btn-folder-off'),hd=el('syncstat');
   if(dirHandle){st.textContent=`連携中: ${dirHandle.name}`;btn.textContent='別のフォルダに変更';off.classList.remove('hidden');hd.textContent=`📂 ${dirHandle.name} と同期中`;hd.classList.add('on');}
   else{st.textContent='';btn.textContent='フォルダを連携する';off.classList.add('hidden');hd.textContent=window.showDirectoryPicker?'フォルダ未連携':'';hd.classList.remove('on');}
@@ -952,6 +1099,8 @@ function deleteSubject(id){
   S.assignments=S.assignments.filter(a=>a.subjectId!==id);
   for(const d of S.digests.filter(d=>d.subjectId===id))S.deleted[d.id]=now;   // まとめは教科に紐づくので削除
   S.digests=S.digests.filter(d=>d.subjectId!==id);
+  for(const t of S.timetable.filter(t=>t.subjectId===id))S.deleted[t.id]=now;
+  S.timetable=S.timetable.filter(t=>t.subjectId!==id);
   for(const r of S.recordings.filter(r=>r.subjectId===id)){r.subjectId=null;r.up=now;}  // 文字起こしは残す
   S.subjects=S.subjects.filter(x=>x.id!==id);
   (async()=>{
@@ -987,6 +1136,16 @@ function openClaude(date){
   el('cl-files').innerHTML=list.map(f=>`<label><input type="checkbox" checked value="${f.id}"><span class="nm">[${esc(subjName(f.subjectId))}] ${esc(f.name)}</span></label>`).join('')||'<div class="empty" style="padding:6px">この日のファイルはありません</div>';
   el('cl-q').value='';
   el('cl-tasks').checked=false;
+  const recs=S.recordings.filter(r=>r.date===date);
+  el('cl-recnote').textContent=recs.length?`（${recs.length}件あります）`:'（この日の録音はありません）';
+  el('cl-rec').checked=recs.length>0;
+  el('cl-rec').disabled=!recs.length;
+  el('cl-sum').disabled=!hasKey();
+  el('cl-status').textContent=hasKey()?'':'APIキーを登録するとアプリ内で要約できます。';
+  const ns=noteSummaryOf(date);
+  el('cl-result').classList.toggle('hidden',!ns);
+  el('cl-result').classList.remove('stream');
+  el('cl-result').innerHTML=ns?mdToHtml(ns.text):'';
   const pcnote=el('cl-pcnote');
   if(dirHandle){pcnote.classList.remove('hidden');pcnote.innerHTML=`💻 PCでは <span class="kbd">${esc(dirHandle.name)}/ノート/${esc(date)}/</span> にファイルが保存済みです。Claude Codeに「このフォルダのノートをまとめて」と頼めます。`;}
   else pcnote.classList.add('hidden');
@@ -994,7 +1153,10 @@ function openClaude(date){
   el('cl-share').disabled=!navigator.share;
   el('cl-modal').classList.add('open');
 }
-function closeClaude(){el('cl-modal').classList.remove('open');clDate=null;}
+function closeClaude(){
+  if(busy){toast('要約の実行中です。終わるまでお待ちください');return;}
+  el('cl-modal').classList.remove('open');clDate=null;
+}
 function clSelectedFiles(){
   const ids=[...el('cl-files').querySelectorAll('input:checked')].map(i=>i.value);
   return FILES.filter(f=>ids.includes(f.id));
@@ -1038,6 +1200,101 @@ async function copyPrompt(){
 }
 function openClaudeWeb(){
   window.open('https://claude.ai/new?q='+encodeURIComponent(buildPrompt()),'_blank');
+}
+
+/* ===================== ノートをアプリ内で要約 ===================== */
+const IMG_OK=['image/jpeg','image/png','image/gif','image/webp'];
+function blobToB64(blob){
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onload=()=>res(String(r.result).split(',')[1]||'');
+    r.onerror=()=>rej(r.error);
+    r.readAsDataURL(blob);
+  });
+}
+function noteSummaryOf(date){return S.noteSummaries.find(n=>n.date===date)||null;}
+
+async function summarizeNotes(){
+  if(busy){toast('別の処理を実行中です');return;}
+  if(!hasKey()){toast('設定タブでAPIキーを登録してください');setTab('settings');return;}
+  const files=clSelectedFiles().filter(f=>IMG_OK.indexOf(f.type)>=0);
+  const skipped=clSelectedFiles().length-files.length;
+  const useRec=el('cl-rec').checked;
+  const recs=useRec?S.recordings.filter(r=>r.date===clDate):[];
+  if(!files.length&&!recs.length){
+    toast(skipped?'写真（JPEG/PNG）を選んでください。PDFはアプリ内要約に対応していません':'要約する材料がありません');
+    return;
+  }
+
+  const subjects=[...new Set(files.map(f=>subjName(f.subjectId)).concat(recs.map(r=>subjName(r.subjectId))))];
+  const sname=subjects.join('・')||'授業';
+  const q=el('cl-q').value.trim();
+
+  busy=true;aborter=new AbortController();
+  const sig=aborter.signal;
+  el('cl-sum').disabled=true;
+  el('cl-result').classList.remove('hidden');
+  el('cl-result').classList.add('stream');
+  el('cl-result').innerHTML='<span class="caret"></span>';
+  el('cl-status').innerHTML='<span class="spin"></span>写真を読み取っています…';
+
+  try{
+    const content=[];
+    for(const f of files){
+      content.push({type:'image',source:{type:'base64',media_type:f.type,data:await blobToB64(f.blob)}});
+    }
+    let text=`${fmtJP(clDate)}の${sname}のノート・プリントです。`;
+    if(files.length)text+=`（写真${files.length}枚）`;
+    if(recs.length){
+      const parts=[];
+      for(const r of recs)parts.push(`【${subjName(r.subjectId)}・${r.title}】\n${(await bodyGet(r.id)).transcript}`);
+      const joined=splitText(parts.join('\n\n'),CHUNK_CHARS*2)[0];
+      text+=`\n\n同じ日の授業の文字起こしです。写真と突き合わせてまとめてください。\n\n${joined}`;
+    }
+    if(q)text+=`\n\n【指示】${q}`;
+    content.push({type:'text',text});
+
+    const sys=
+`あなたは生徒の学習アシスタントです。渡されたノート・プリントの写真（と、あれば同じ日の授業の文字起こし）から、復習に使えるまとめを日本語で作ってください。
+
+## 要点
+板書やプリントの中心になっている内容を箇条書きで。
+
+## 重要な用語・公式
+「用語 — 説明」の形で。数式は読んで分かる形で正確に書く。
+
+## 押さえるべき例題・問題
+出ていれば、問題と考え方を簡潔に。
+
+## 宿題・連絡
+書かれていれば「いつまでに何を」の形で。
+
+読み取れない字や崩れている箇所は無理に推測せず「判読できず」と書いてください。写真に写っていないことを補ってはいけません。まとめ本文だけを出力してください。`;
+
+    const out=await callClaude(sys,content,{effort:'medium',signal:sig,maxTokens:16000,
+      onDelta:t=>{el('cl-result').innerHTML=esc(t)+'<span class="caret"></span>';}});
+
+    const subjectId=(files[0]&&files[0].subjectId)||(recs[0]&&recs[0].subjectId)||null;
+    const prev=noteSummaryOf(clDate);
+    if(prev)Object.assign(prev,{text:out.text,subjectId,fileIds:files.map(f=>f.id),costUSD:out.cost,up:Date.now()});
+    else S.noteSummaries.push({id:uid(),date:clDate,subjectId,text:out.text,
+                               fileIds:files.map(f=>f.id),costUSD:out.cost,up:Date.now()});
+    save();
+    el('cl-result').classList.remove('stream');
+    el('cl-result').innerHTML=mdToHtml(out.text);
+    el('cl-status').textContent=`完了しました・約 $${(out.cost||0).toFixed(3)}`
+      +(skipped?`（PDF ${skipped}件は対象外）`:'');
+  }catch(e){
+    el('cl-result').classList.remove('stream');
+    el('cl-result').innerHTML='';
+    el('cl-result').classList.add('hidden');
+    el('cl-status').innerHTML=e.name==='AbortError'
+      ?'<span style="color:var(--warn)">中止しました。</span>'
+      :`<span style="color:var(--danger)">${esc(e.message)}</span>`;
+  }finally{
+    busy=false;aborter=null;
+    el('cl-sum').disabled=!hasKey();
+  }
 }
 
 /* ===================== フォルダ連携 (File System Access API) ===================== */
@@ -1092,7 +1349,7 @@ async function folderSync(absorb){
     if(absorb)await absorbFolderJSON();
     /* データJSON書き出し（ファイル本体は実ファイルとして別に保存するのでメタのみ） */
     const meta=FILES.map(f=>({id:f.id,name:f.name,type:f.type,size:f.size,date:f.date,subjectId:f.subjectId,up:f.up}));
-    const json=JSON.stringify({app:APP_TAG,ver:1,exportedAt:new Date().toISOString(),subjects:S.subjects,assignments:S.assignments,recordings:S.recordings,digests:S.digests,deleted:S.deleted,files:meta},null,1);
+    const json=JSON.stringify({app:APP_TAG,ver:2,exportedAt:new Date().toISOString(),subjects:S.subjects,assignments:S.assignments,recordings:S.recordings,digests:S.digests,timetable:S.timetable,noteSummaries:S.noteSummaries,deleted:S.deleted,files:meta},null,1);
     await writeSummaryFiles();
     const fh=await dirHandle.getFileHandle('学習データ.json',{create:true});
     const w=await fh.createWritable();await w.write(json);await w.close();
@@ -1110,6 +1367,7 @@ async function absorbFolderJSON(){
       if(d&&d.app===APP_TAG){
         changed+=mergeData(d);
         changed+=await mergeFiles(d.files);
+        changed+=await mergeBodies(d.bodies);
       }
     }catch(e){}
   }
@@ -1167,8 +1425,14 @@ function dataURLtoBlob(u){
   for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);
   return new Blob([arr],{type:mime});
 }
-async function buildExport(includeFiles){
-  const o={app:APP_TAG,ver:1,exportedAt:new Date().toISOString(),subjects:S.subjects,assignments:S.assignments,recordings:S.recordings,digests:S.digests,deleted:S.deleted};
+async function buildExport(includeFiles,includeText){
+  const o={app:APP_TAG,ver:2,exportedAt:new Date().toISOString(),subjects:S.subjects,assignments:S.assignments,recordings:S.recordings,digests:S.digests,timetable:S.timetable,noteSummaries:S.noteSummaries,deleted:S.deleted};
+  /* 文字起こしは大きいので任意。要約だけなら20分の1程度に収まる */
+  o.bodies=[];
+  for(const r of S.recordings){
+    const b=await bodyGet(r.id);
+    o.bodies.push({id:r.id,summary:b.summary,transcript:includeText?b.transcript:'',up:r.up});
+  }
   o.files=[];
   for(const f of FILES){
     const m={id:f.id,name:f.name,type:f.type,size:f.size,date:f.date,subjectId:f.subjectId,up:f.up};
@@ -1176,6 +1440,24 @@ async function buildExport(includeFiles){
     o.files.push(m);
   }
   return JSON.stringify(o);
+}
+/* 本文のマージ。空の文字起こしで既存の本文を上書きしない */
+async function mergeBodies(arr){
+  if(!Array.isArray(arr))return 0;
+  let n=0;
+  for(const b of arr){
+    if(!b||!b.id)continue;
+    const t=S.deleted[b.id];
+    if(t&&t>=(b.up||0))continue;
+    const cur=await bodyGet(b.id);
+    const patch={};
+    if(b.transcript&&b.transcript!==cur.transcript)patch.transcript=b.transcript;
+    if(b.summary&&b.summary!==cur.summary)patch.summary=b.summary;
+    if(!Object.keys(patch).length)continue;
+    await bodySet(b.id,patch);
+    n++;
+  }
+  return n;
 }
 async function mergeFiles(arr){
   if(!Array.isArray(arr))return 0;
@@ -1199,7 +1481,7 @@ async function mergeFiles(arr){
 }
 async function exportShare(){
   toast('書き出し中…');
-  const json=await buildExport(el('exp-files').checked);
+  const json=await buildExport(el('exp-files').checked,el('exp-text').checked);
   const file=new File([json],`学習管理データ.json`,{type:'application/json'});
   try{
     if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file]});return;}
@@ -1207,7 +1489,7 @@ async function exportShare(){
   exportDownload(json);
 }
 async function exportDownload(json){
-  json=typeof json==='string'?json:await buildExport(el('exp-files').checked);
+  json=typeof json==='string'?json:await buildExport(el('exp-files').checked,el('exp-text').checked);
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([json],{type:'application/json'}));
   a.download='学習管理データ.json';
@@ -1221,9 +1503,10 @@ async function importFile(file){
     if(d.app!==APP_TAG&&!confirm('このアプリの書き出しデータではないようです。読み込みますか？'))return;
     const c1=mergeData(d);
     const c2=await mergeFiles(d.files);
+    const c3=await mergeBodies(d.bodies);
     await refreshFiles();
     save();
-    toast(c1+c2?`読み込みました（${c1+c2}件更新）`:'新しいデータはありませんでした');
+    toast(c1+c2+c3?`読み込みました（${c1+c2+c3}件更新）`:'新しいデータはありませんでした');
   }catch(e){toast('読み込みに失敗しました');console.warn(e);}
 }
 
@@ -1234,6 +1517,12 @@ const MODELS=[
   {id:'claude-opus-5',    label:'Opus 5（最高精度・高価）',      effort:true },
   {id:'claude-haiku-4-5', label:'Haiku 4.5（最安・速い）',       effort:false},
 ];
+/* 100万トークンあたりの単価（platform.claude.com/docs/en/about-claude/pricing） */
+const PRICE={
+  'claude-sonnet-5':{in:2,out:10},
+  'claude-opus-5':{in:5,out:25},
+  'claude-haiku-4-5':{in:1,out:5},
+};
 const COST_NOTE={
   'claude-sonnet-5':'50分の授業1コマあたり およそ $0.18（約28円）。',
   'claude-opus-5':'50分の授業1コマあたり およそ $0.44（約68円）。Sonnet 5 の約2.5倍です。',
@@ -1303,8 +1592,13 @@ async function callClaude(system,user,opt){
   const key=(AI.apiKey||'').trim();
   if(!key)throw new Error('APIキーが未設定です。');
   const info=modelInfo();
-  const body={model:info.id,max_tokens:opt.maxTokens||16000,system,messages:[{role:'user',content:user}],stream:true};
-  if(info.effort)body.output_config={effort:opt.effort||'medium'};
+  const streaming=!opt.schema;          /* 構造化出力はストリーミングを使わない */
+  const body={model:info.id,max_tokens:opt.maxTokens||16000,system,
+              messages:[{role:'user',content:user}],stream:streaming};
+  const oc={};
+  if(info.effort)oc.effort=opt.effort||'medium';
+  if(opt.schema)oc.format={type:'json_schema',schema:opt.schema};
+  if(Object.keys(oc).length)body.output_config=oc;
 
   let res;
   try{
@@ -1327,31 +1621,46 @@ async function callClaude(system,user,opt){
     throw new Error(msg);
   }
 
-  const reader=res.body.getReader(),dec=new TextDecoder();
-  let buf='',text='',stop=null;
-  for(;;){
-    const{done,value}=await reader.read();
-    if(done)break;
-    buf+=dec.decode(value,{stream:true});
-    let nl;
-    while((nl=buf.indexOf('\n'))>=0){
-      const line=buf.slice(0,nl).trim();buf=buf.slice(nl+1);
-      if(!line||line.indexOf('data:')!==0)continue;
-      let ev;try{ev=JSON.parse(line.slice(5).trim());}catch(e){continue;}
-      if(ev.type==='content_block_delta'&&ev.delta&&ev.delta.type==='text_delta'){
-        text+=ev.delta.text;
-        if(opt.onDelta)opt.onDelta(text);
-      }else if(ev.type==='message_delta'&&ev.delta&&ev.delta.stop_reason){
-        stop=ev.delta.stop_reason;
-      }else if(ev.type==='error'){
-        throw new Error((ev.error&&ev.error.message)||'ストリーミング中にエラーが発生しました。');
+  let text='',stop=null,inTok=0,outTok=0;
+
+  if(!streaming){
+    const j=await res.json();
+    stop=j.stop_reason||null;
+    inTok=(j.usage&&j.usage.input_tokens)||0;
+    outTok=(j.usage&&j.usage.output_tokens)||0;
+    text=(j.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
+  }else{
+    const reader=res.body.getReader(),dec=new TextDecoder();
+    let buf='';
+    for(;;){
+      const{done,value}=await reader.read();
+      if(done)break;
+      buf+=dec.decode(value,{stream:true});
+      let nl;
+      while((nl=buf.indexOf('\n'))>=0){
+        const line=buf.slice(0,nl).trim();buf=buf.slice(nl+1);
+        if(!line||line.indexOf('data:')!==0)continue;
+        let ev;try{ev=JSON.parse(line.slice(5).trim());}catch(e){continue;}
+        if(ev.type==='content_block_delta'&&ev.delta&&ev.delta.type==='text_delta'){
+          text+=ev.delta.text;
+          if(opt.onDelta)opt.onDelta(text);
+        }else if(ev.type==='message_start'&&ev.message&&ev.message.usage){
+          inTok=ev.message.usage.input_tokens||0;
+        }else if(ev.type==='message_delta'){
+          if(ev.delta&&ev.delta.stop_reason)stop=ev.delta.stop_reason;
+          if(ev.usage&&ev.usage.output_tokens)outTok=ev.usage.output_tokens;
+        }else if(ev.type==='error'){
+          throw new Error((ev.error&&ev.error.message)||'ストリーミング中にエラーが発生しました。');
+        }
       }
     }
   }
+
   if(stop==='refusal')throw new Error('この内容には回答できないと判断されました。');
   text=text.trim();
   if(!text)throw new Error('応答が空でした。もう一度お試しください。');
-  return{text,truncated:stop==='max_tokens'};
+  const cost=inTok/1e6*(PRICE[info.id]?PRICE[info.id].in:0)+outTok/1e6*(PRICE[info.id]?PRICE[info.id].out:0);
+  return{text,truncated:stop==='max_tokens',inTok,outTok,cost};
 }
 
 /* ---------- 授業向けプロンプト ---------- */
@@ -1412,10 +1721,56 @@ const SYS={
 /* ===================== 授業録音：録音エンジン ===================== */
 const ROTATE_MS=20000, OVERLAP_MS=1800;
 const R={active:null,standby:null,running:false,paused:false,segments:[],interim:'',
-         startedAt:0,elapsed:0,timerId:null,rotTimer:null,overlapTimer:null,
+         startedAt:0,elapsed:0,timerId:null,draftId:null,rotTimer:null,overlapTimer:null,
          restarts:[],rotations:0,overlap:true,wakeLock:null,subjectId:null,date:'',title:''};
 
 function speechCtor(){return window.SpeechRecognition||window.webkitSpeechRecognition||null;}
+
+/* ---- 録音中の自動退避（タブが落ちても内容を失わない） ---- */
+const DRAFT_MS=30000;
+async function saveDraft(){
+  if(!R.running)return;
+  const segments=R.segments.slice();
+  if(!segments.length)return;
+  try{
+    await kvSet('rec-draft',{subjectId:R.subjectId,date:R.date,title:R.title,segments,
+      elapsed:R.elapsed+(R.paused?0:Date.now()-R.startedAt),savedAt:Date.now()});
+  }catch(e){}
+}
+async function clearDraft(){try{await kvDel('rec-draft');}catch(e){}}
+
+async function checkDraft(){
+  let d=null;
+  try{d=await kvGet('rec-draft');}catch(e){}
+  if(!d||!Array.isArray(d.segments)||!d.segments.length)return;
+  const text=d.segments.join('');
+  const bar=el('v-draft');
+  bar.innerHTML=`前回の録音が途中で終わっています（${subjName(d.subjectId)}・${fmtJP(d.date)}・${fmtDur(d.elapsed)}・${text.length.toLocaleString()}文字）。
+    <button class="mini save" id="v-draft-keep">保存する</button>
+    <button class="mini" id="v-draft-drop">破棄する</button>`;
+  bar.classList.remove('hidden');
+  el('v-draft-keep').onclick=async()=>{
+    const sname=subjName(d.subjectId);
+    const rec={id:uid(),subjectId:d.subjectId,date:d.date||today(),
+      title:d.title||`${sname} ${fmtJP(d.date||today())}の授業（復元）`,
+      chars:text.length,hasSummary:false,summaryAt:0,model:'',
+      inTok:0,outTok:0,costUSD:0,durationMs:d.elapsed||0,up:Date.now()};
+    try{await bodySet(rec.id,{transcript:text,summary:''});}
+    catch(e){toast('復元に失敗しました：'+e.message);return;}
+    S.recordings.push(rec);
+    await clearDraft();
+    bar.classList.add('hidden');
+    save();
+    toast('復元しました');
+    openRec(rec.id);
+  };
+  el('v-draft-drop').onclick=async()=>{
+    if(!confirm('途中の録音を破棄します。よろしいですか？'))return;
+    await clearDraft();
+    bar.classList.add('hidden');
+    toast('破棄しました');
+  };
+}
 function fmtDur(ms){
   const s=Math.floor((ms||0)/1000),h=Math.floor(s/3600),m=Math.floor(s%3600/60),ss=s%60;
   const p=n=>String(n).padStart(2,'0');
@@ -1569,8 +1924,10 @@ function startRec(){
   R.elapsed=0;R.startedAt=Date.now();R.running=true;R.paused=false;
   try{startActive();}
   catch(e){R.running=false;showRecError('音声認識を開始できませんでした：'+e.message);return;}
+  el('v-draft').classList.add('hidden');
   updateRecUI();renderLive();updateRecHealth();
   R.timerId=setInterval(recTick,250);recTick();
+  R.draftId=setInterval(saveDraft,DRAFT_MS);
   acquireWakeLock();
 }
 function pauseRec(){
@@ -1589,26 +1946,33 @@ function stopRec(save_){
   if(!R.paused)R.elapsed+=Date.now()-R.startedAt;
   R.running=false;R.paused=false;
   clearInterval(R.timerId);R.timerId=null;
+  clearInterval(R.draftId);R.draftId=null;
   stopAllRecognizers();releaseWakeLock();
   const transcript=joinSegments().trim();
   R.interim='';
   updateRecUI();renderLive();updateRecHealth();
-  if(!save_)return;
-  if(!transcript){toast('文字起こしが空のため保存しませんでした');return;}
+  if(!save_){saveDraft();return;}    /* 異常停止時は下書きを残して復元できるようにする */
+  if(!transcript){toast('文字起こしが空のため保存しませんでした');clearDraft();return;}
 
   const sname=subjName(R.subjectId);
   const rec={
     id:uid(),subjectId:R.subjectId,date:R.date,
     title:R.title||`${sname} ${fmtJP(R.date)}の授業`,
-    transcript,summary:'',summaryAt:0,model:'',durationMs:R.elapsed,up:Date.now(),
+    chars:transcript.length,hasSummary:false,summaryAt:0,model:'',
+    inTok:0,outTok:0,costUSD:0,durationMs:R.elapsed,up:Date.now(),
   };
-  S.recordings.push(rec);
   el('v-title').value='';
   R.elapsed=0;el('v-timer').textContent='00:00';
-  save();
-  toast('保存しました');
-  openRec(rec.id);
-  if(hasKey())summarizeRec(rec.id);   /* キーがあればそのまま要約まで走らせる */
+  (async()=>{
+    try{await bodySet(rec.id,{transcript,summary:''});}
+    catch(e){toast('文字起こしの保存に失敗しました：'+e.message);return;}
+    S.recordings.push(rec);
+    await clearDraft();
+    save();
+    toast('保存しました');
+    await openRec(rec.id);
+    if(hasKey())summarizeRec(rec.id);   /* キーがあればそのまま要約まで走らせる */
+  })();
 }
 
 /* ===================== 授業録音：一覧 ===================== */
@@ -1617,13 +1981,18 @@ function recSorted(list){
 }
 function renderVoice(){
   const filter=el('fv-subj').value;
-  const list=S.recordings.filter(r=>filter==='all'||((r.subjectId||'')===filter));
-  el('v-listcount').textContent=S.recordings.length?`${list.length}件`:'';
+  let list=S.recordings.filter(r=>filter==='all'||((r.subjectId||'')===filter));
+  if(searchHits)list=list.filter(r=>searchHits.has(r.id));
+  el('v-listcount').textContent=S.recordings.length
+    ?(searchQ?`${list.length} / ${S.recordings.length}件`:`${list.length}件`):'';
   if(!S.recordings.length){
     el('v-list').innerHTML='<div class="empty">まだ録音がありません<br>上で教科を選んで「録音開始」を押してください</div>';
     return;
   }
-  if(!list.length){el('v-list').innerHTML='<div class="empty">この教科の録音はありません</div>';return;}
+  if(!list.length){
+    el('v-list').innerHTML=`<div class="empty">${searchQ?'一致する授業がありません':'この教科の録音はありません'}</div>`;
+    return;
+  }
 
   /* 教科ごとにまとめる（教科タブの並び順、未分類は最後） */
   const groups=[];
@@ -1635,7 +2004,7 @@ function renderVoice(){
   if(none.length)groups.push({id:'',name:'未分類',color:'#a8b3cf',items:none});
 
   el('v-list').innerHTML=groups.map(g=>{
-    const done=g.items.filter(r=>r.summary).length;
+    const done=g.items.filter(r=>r.hasSummary).length;
     const dg=g.id?S.digests.find(d=>d.subjectId===g.id):null;
     return `<div class="dgroup">
       <div class="dghead">
@@ -1651,19 +2020,146 @@ function renderVoice(){
             <div class="rmeta">
               <span>${fmtJP(r.date)}</span>
               <span>${fmtDur(r.durationMs)}</span>
-              <span>${(r.transcript||'').length.toLocaleString()}文字</span>
-              ${r.summary?'<span class="okbadge">要約済み</span>':'<span class="nobadge">未要約</span>'}
+              <span>${(r.chars||0).toLocaleString()}文字</span>
+              ${r.hasSummary?'<span class="okbadge">要約済み</span>':'<span class="nobadge">未要約</span>'}
             </div>
+            ${searchHits&&searchHits.get(r.id)?`<div class="rhit">${esc(searchHits.get(r.id))}</div>`:''}
           </div>
         </div>`).join('')}</div>
     </div>`;
   }).join('');
 }
 
+/* ===================== 時間割 ===================== */
+const LS_PERIODS='study-manager-periods-v1';
+const DEFAULT_PERIODS=[
+  {n:1,start:'08:50',end:'09:40'},{n:2,start:'09:50',end:'10:40'},
+  {n:3,start:'10:50',end:'11:40'},{n:4,start:'11:50',end:'12:40'},
+  {n:5,start:'13:30',end:'14:20'},{n:6,start:'14:30',end:'15:20'},
+];
+let PERIODS=loadPeriods();
+function loadPeriods(){
+  try{
+    const d=JSON.parse(localStorage.getItem(LS_PERIODS));
+    if(Array.isArray(d)&&d.length)return d;
+  }catch(e){}
+  return DEFAULT_PERIODS.map(p=>({...p}));
+}
+function savePeriods(){try{localStorage.setItem(LS_PERIODS,JSON.stringify(PERIODS));}catch(e){}}
+const minutesOf=hhmm=>{const m=/^(\d{1,2}):(\d{2})$/.exec(hhmm||'');return m?+m[1]*60+ +m[2]:-1;};
+
+/* いまの曜日・時刻に当たるコマ（授業中でなければ直前に終わったコマ） */
+function currentSlot(){
+  const now=new Date(),day=now.getDay(),mins=now.getHours()*60+now.getMinutes();
+  const today_=S.timetable.filter(t=>t.day===day);
+  if(!today_.length)return null;
+  let best=null,bestGap=Infinity;
+  for(const t of today_){
+    const p=PERIODS.find(p=>p.n===t.period);
+    if(!p)continue;
+    const s=minutesOf(p.start),e=minutesOf(p.end);
+    if(s<0||e<0)continue;
+    if(mins>=s-10&&mins<=e+10)return t;            /* 授業中（前後10分の余裕） */
+    const gap=mins-e;
+    if(gap>0&&gap<bestGap){bestGap=gap;best=t;}    /* 直前に終わったコマ */
+  }
+  return bestGap<=60?best:null;
+}
+function applyCurrentSlot(){
+  if(R.running)return;
+  const t=currentSlot();
+  if(!t||!subjOf(t.subjectId))return;
+  el('v-subj').value=t.subjectId;
+  if(!el('v-title').value.trim())el('v-title').placeholder=`${subjName(t.subjectId)}（${t.period}限）`;
+}
+function renderTimetable(){
+  const opts=S.subjects.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('');
+  const keep=(sel,html)=>{const v=sel.value;sel.innerHTML=html;if([...sel.options].some(o=>o.value===v))sel.value=v;};
+  keep(el('tt-day'),WD.split('').map((w,i)=>`<option value="${i}">${w}曜</option>`).join(''));
+  keep(el('tt-period'),PERIODS.map(p=>`<option value="${p.n}">${p.n}限（${p.start}〜${p.end}）</option>`).join(''));
+  keep(el('tt-subj'),opts||'<option value="">先に教科を追加してください</option>');
+  el('tt-count').textContent=S.timetable.length?`${S.timetable.length}コマ`:'';
+
+  const days=[1,2,3,4,5,6,0].filter(d=>d!==0||S.timetable.some(t=>t.day===0));
+  const cells=PERIODS.map(p=>{
+    const row=days.map(d=>{
+      const t=S.timetable.find(x=>x.day===d&&x.period===p.n);
+      const s=t&&subjOf(t.subjectId);
+      return `<td>${s?`<button class="tt-cell" data-rm="${t.id}" style="border-color:${s.color};color:${s.color}">${esc(s.name)}</button>`:'<span class="tt-empty">−</span>'}</td>`;
+    }).join('');
+    return `<tr><th>${p.n}限</th>${row}</tr>`;
+  }).join('');
+  el('tt-grid').innerHTML=S.timetable.length
+    ? `<div style="overflow-x:auto"><table class="tt"><tr><th></th>${days.map(d=>`<th>${WD[d]}</th>`).join('')}</tr>${cells}</table></div>
+       <div class="mnote">コマをタップすると削除します。</div>`
+    : '<div class="empty">まだ登録がありません</div>';
+
+  el('tt-times').innerHTML=PERIODS.map(p=>`
+    <div class="setrow" style="margin-bottom:6px">
+      <span class="mnote" style="margin:0;min-width:40px">${p.n}限</span>
+      <input type="time" value="${p.start}" data-pn="${p.n}" data-f="start" style="width:auto;min-height:0;padding:5px 8px">
+      <span class="mnote" style="margin:0">〜</span>
+      <input type="time" value="${p.end}" data-pn="${p.n}" data-f="end" style="width:auto;min-height:0;padding:5px 8px">
+    </div>`).join('');
+}
+
+/* ===================== 録音の検索 ===================== */
+let searchQ='',searchHits=null;
+async function runSearch(q){
+  searchQ=q.trim();
+  if(!searchQ){searchHits=null;renderVoice();return;}
+  const words=searchQ.toLowerCase().split(/\s+/).filter(Boolean);
+  const hits=new Map();
+  for(const r of S.recordings){
+    let b={transcript:'',summary:''};
+    try{b=await bodyGet(r.id);}catch(e){}
+    const hay=`${r.title}\n${b.summary}\n${b.transcript}`.toLowerCase();
+    if(!words.every(w=>hay.indexOf(w)>=0))continue;
+    const src=b.summary||b.transcript;
+    const at=src.toLowerCase().indexOf(words[0]);
+    hits.set(r.id,at>=0?(at>30?'…':'')+src.slice(Math.max(0,at-30),at+70).replace(/\n/g,' ')+'…':'');
+  }
+  if(searchQ!==q.trim())return;          /* 入力が進んでいたら捨てる */
+  searchHits=hits;
+  renderVoice();
+}
+
+/* ===================== 文字起こしの編集画面 ===================== */
+let edId=null,edOrig='';
+async function openEditor(id){
+  const r=getRec(id);if(!r)return;
+  edId=id;
+  el('ed-head').textContent=`✎ ${r.title}`;
+  const b=await bodyGet(id);
+  edOrig=b.transcript;
+  el('ed-text').value=b.transcript;
+  el('ed-find').value='';el('ed-repl').value='';el('ed-hits').textContent='';
+  el('ed-count').textContent=`${b.transcript.length.toLocaleString()} 文字`;
+  el('ed-modal').classList.add('open');
+}
+function edCountHits(){
+  const f=el('ed-find').value;
+  if(!f){el('ed-hits').textContent='';return 0;}
+  const n=el('ed-text').value.split(f).length-1;
+  el('ed-hits').textContent=n?`${n}件`:'見つかりません';
+  return n;
+}
+function edFindNext(){
+  const ta=el('ed-text'),f=el('ed-find').value;
+  if(!f)return;
+  const from=ta.selectionEnd||0;
+  let at=ta.value.indexOf(f,from);
+  if(at<0)at=ta.value.indexOf(f,0);
+  if(at<0){el('ed-hits').textContent='見つかりません';return;}
+  ta.focus();ta.setSelectionRange(at,at+f.length);
+  const ratio=at/Math.max(1,ta.value.length);
+  ta.scrollTop=ratio*ta.scrollHeight-ta.clientHeight/2;
+}
+
 /* ===================== 授業録音：詳細 ===================== */
 let curRec=null,busy=false;
 function getRec(id){return S.recordings.find(r=>r.id===id)||null;}
-function openRec(id){
+async function openRec(id){
   const r=getRec(id);if(!r)return;
   curRec=id;
   el('rec-head').textContent=`🎙️ ${subjName(r.subjectId)}・${fmtJP(r.date)}`;
@@ -1671,46 +2167,72 @@ function openRec(id){
   el('rec-subj').value=r.subjectId||'';
   el('rec-date').value=r.date||today();
   el('rec-title').value=r.title||'';
-  el('rec-text').value=r.transcript||'';
-  el('rec-textcount').textContent=`${(r.transcript||'').length.toLocaleString()} 文字`;
-  el('rec-summary').innerHTML=mdToHtml(r.summary);
+  el('rec-text').value='';
+  el('rec-textcount').textContent='読み込み中…';
+  el('rec-summary').innerHTML='';
   el('rec-summary').classList.remove('stream');
-  el('rec-status').textContent=r.summaryAt?`${new Date(r.summaryAt).toLocaleString('ja-JP')} に ${r.model||''} で作成`:'';
   el('rec-keynote').classList.toggle('hidden',hasKey());
-  el('rec-sum').textContent=r.summary?'✨ 要約を作り直す':'✨ 要約を作る';
-  el('rec-sum').disabled=!hasKey();
+  el('rec-sum').disabled=true;
   el('rec-bar').classList.add('hidden');
   el('rec-abort').classList.add('hidden');
+  el('rec-tasks').innerHTML='';
   el('rec-modal').classList.add('open');
+
+  let b={transcript:'',summary:''};
+  try{b=await bodyGet(id);}catch(e){toast('本文を読み込めませんでした：'+e.message);}
+  if(curRec!==id)return;                       /* 読み込み中に別の録音を開いた */
+  el('rec-text').value=b.transcript;
+  el('rec-textcount').textContent=`${b.transcript.length.toLocaleString()} 文字`;
+  el('rec-summary').innerHTML=mdToHtml(b.summary);
+  el('rec-status').textContent=r.summaryAt
+    ?`${new Date(r.summaryAt).toLocaleString('ja-JP')} に ${r.model||''} で作成`+(r.costUSD?`・約 $${r.costUSD.toFixed(3)}`:'')
+    :'';
+  el('rec-sum').textContent=b.summary?'✨ 要約を作り直す':'✨ 要約を作る';
+  el('rec-sum').disabled=!hasKey()||busy;
 }
 function closeRec(){
   if(busy){toast('要約の実行中です。中止するか終わるまでお待ちください');return;}
   el('rec-modal').classList.remove('open');curRec=null;
 }
-function saveRecEdits(){
+async function saveRecEdits(){
   const r=getRec(curRec);if(!r)return;
+  const id=r.id;
   r.subjectId=el('rec-subj').value||null;
   r.date=el('rec-date').value||r.date;
   r.title=el('rec-title').value.trim()||r.title;
-  r.transcript=el('rec-text').value;
+  const text=el('rec-text').value;
+  const cur=await bodyGet(id);
+  if(text!==cur.transcript){
+    await bodySet(id,{transcript:text});
+    r.chars=text.length;
+  }
   r.up=Date.now();
   save();
 }
-function recPromptText(r){
+function recPromptText(r,transcript){
   return `${subjName(r.subjectId)}の授業（${fmtJP(r.date)}・${r.title}）の文字起こしです。`
     +`\n\n要点・重要用語・先生が強調したところ・宿題や連絡事項に分けて、復習用にまとめてください。`
-    +`\n\n【文字起こし】\n${r.transcript}`;
+    +`\n\n【文字起こし】\n${transcript}`;
 }
 
 async function summarizeRec(id){
   if(busy)return;
   const r=getRec(id);if(!r)return;
   if(!hasKey()){toast('設定タブでAPIキーを登録してください');return;}
-  if(curRec===id&&el('rec-text').value.trim()!==r.transcript){r.transcript=el('rec-text').value.trim();r.up=Date.now();}
-  if(!r.transcript){toast('文字起こしが空です');return;}
+
+  let transcript=(await bodyGet(id)).transcript;
+  if(curRec===id){                      /* 編集中の内容があれば先に保存する */
+    const edited=el('rec-text').value.trim();
+    if(edited&&edited!==transcript){
+      await bodySet(id,{transcript:edited});
+      r.chars=edited.length;r.up=Date.now();
+      transcript=edited;
+    }
+  }
+  if(!transcript){toast('文字起こしが空です');return;}
 
   const sname=subjName(r.subjectId);
-  const chunks=splitText(r.transcript,CHUNK_CHARS);
+  const chunks=splitText(transcript,CHUNK_CHARS);
   const showing=()=>curRec===id&&el('rec-modal').classList.contains('open');
   busy=true;aborter=new AbortController();
   const sig=aborter.signal;
@@ -1731,37 +2253,59 @@ async function summarizeRec(id){
   };
   const stream=t2=>{if(showing())el('rec-summary').innerHTML=esc(t2)+'<span class="caret"></span>';};
 
+  let acc={inTok:0,outTok:0,cost:0};
+  const tally=o=>{acc.inTok+=o.inTok||0;acc.outTok+=o.outTok||0;acc.cost+=o.cost||0;};
+
   try{
     let text='';
     if(chunks.length===1){
       if(showing())el('rec-status').innerHTML='<span class="spin"></span>要約を作成中…';
-      text=(await callClaude(SYS.lesson(sname),r.transcript,
-        {effort:'medium',signal:sig,maxTokens:16000,onDelta:stream})).text;
+      const out=await callClaude(SYS.lesson(sname),transcript,
+        {effort:'medium',signal:sig,maxTokens:16000,onDelta:stream});
+      tally(out);text=out.text;
     }else{
       const notes=[];
       for(let i=0;i<chunks.length;i++){
         if(sig.aborted)throw new DOMException('aborted','AbortError');
         progress(i,chunks.length+1,'授業の内容を読み取り中');
         const out=await callClaude(SYS.lessonMap(sname),chunks[i],{effort:'low',signal:sig,maxTokens:8000});
+        tally(out);
         notes.push(`【${i+1}/${chunks.length}】\n${out.text}`);
       }
       progress(chunks.length,chunks.length+1,'要約にまとめ中');
-      text=(await callClaude(SYS.lesson(sname),
+      const out=await callClaude(SYS.lesson(sname),
         `以下は長い授業を分割して読み取ったメモです。全体をひとつの要約にまとめてください。\n\n${notes.join('\n\n')}`,
-        {effort:'medium',signal:sig,maxTokens:16000,onDelta:stream})).text;
+        {effort:'medium',signal:sig,maxTokens:16000,onDelta:stream});
+      tally(out);text=out.text;
     }
-    r.summary=text;r.summaryAt=Date.now();r.model=modelInfo().id.replace('claude-','');r.up=Date.now();
+
+    /* 宿題・提出物を構造化出力で抜き出す（要約だけを読ませるので安い） */
+    let tasks=[];
+    try{
+      if(showing())el('rec-status').innerHTML='<span class="spin"></span>宿題を探しています…';
+      tasks=await extractTasks(text,sname,r.date,sig);
+    }catch(e){ if(e.name==='AbortError')throw e; /* 抽出の失敗は要約を捨てない */ }
+
+    await bodySet(id,{summary:text});
+    r.hasSummary=true;r.summaryAt=Date.now();r.model=modelInfo().id.replace('claude-','');
+    r.inTok=acc.inTok;r.outTok=acc.outTok;r.costUSD=acc.cost;r.up=Date.now();
     save();
     if(showing()){
       el('rec-summary').classList.remove('stream');
       el('rec-summary').innerHTML=mdToHtml(text);
-      el('rec-status').textContent=chunks.length>1?`完了しました（${chunks.length}分割で処理）`:'完了しました。';
+      el('rec-status').textContent=(chunks.length>1?`完了しました（${chunks.length}分割）`:'完了しました')
+        +`・約 $${acc.cost.toFixed(3)}`;
       el('rec-sum').textContent='✨ 要約を作り直す';
-    }else toast(`「${r.title}」の要約ができました`);
+      renderTaskCandidates(id,tasks);
+    }else{
+      pendingTasks.set(id,tasks);
+      toast(`「${r.title}」の要約ができました`+(tasks.length?`（宿題${tasks.length}件）`:''));
+    }
   }catch(e){
+    const b=await bodyGet(id).catch(()=>({summary:''}));
     if(showing()){
       el('rec-summary').classList.remove('stream');
-      el('rec-summary').innerHTML=mdToHtml(r.summary);
+      el('rec-summary').innerHTML=mdToHtml(b.summary);
       el('rec-status').innerHTML=e.name==='AbortError'
         ?'<span style="color:var(--warn)">中止しました。</span>'
         :`<span style="color:var(--danger)">${esc(e.message)}</span>`;
@@ -1776,19 +2320,97 @@ async function summarizeRec(id){
   }
 }
 
+/* ===================== 授業録音：宿題の抽出 ===================== */
+const TASK_SCHEMA={
+  type:'object',
+  properties:{
+    tasks:{
+      type:'array',
+      items:{
+        type:'object',
+        properties:{
+          title:{type:'string'},
+          due:{type:'string'},
+          kind:{type:'string',enum:['宿題','提出物','持ち物','テスト','連絡']},
+        },
+        required:['title','due','kind'],
+        additionalProperties:false,
+      },
+    },
+  },
+  required:['tasks'],
+  additionalProperties:false,
+};
+const pendingTasks=new Map();   /* 画面を開いていないときに出た候補を持っておく */
+
+async function extractTasks(summary,sname,date,signal){
+  const sys=
+`あなたは学習アシスタントです。${sname}の授業の要約から、生徒が「やらなければならないこと」だけを抜き出してください。
+
+- 宿題・提出物・持ち物・テストの予告・締切のある連絡だけを対象にする
+- 授業で学んだ内容そのものは含めない
+- title は「教科書p.12〜14を解く」のように、後で見て何をするか分かる短い文にする
+- due は締切の日付を YYYY-MM-DD で書く。授業日は ${date} なので「次回まで」「来週まで」はそこから計算する。判断できないときは空文字にする
+- 要約に書かれていないものを作ってはいけない。該当が無ければ空の配列を返す`;
+  const out=await callClaude(sys,summary,{schema:TASK_SCHEMA,effort:'low',maxTokens:4000,signal});
+  let parsed;
+  try{parsed=JSON.parse(out.text);}catch(e){return[];}
+  const list=Array.isArray(parsed&&parsed.tasks)?parsed.tasks:[];
+  return list.filter(t=>t&&typeof t.title==='string'&&t.title.trim())
+             .map(t=>({title:t.title.trim(),
+                       due:/^\d{4}-\d{2}-\d{2}$/.test(t.due||'')?t.due:'',
+                       kind:t.kind||'宿題'}))
+             .slice(0,12);
+}
+
+function renderTaskCandidates(id,tasks){
+  const box=el('rec-tasks');
+  if(!tasks||!tasks.length){box.innerHTML='';return;}
+  const r=getRec(id);
+  box.innerHTML=`
+    <label style="margin-top:14px">この授業で出た宿題（チェックしたものを課題に追加します）</label>
+    <div class="flist-check">
+      ${tasks.map((t,i)=>`<label>
+        <input type="checkbox" checked value="${i}">
+        <span class="nm">[${esc(t.kind)}] ${esc(t.title)}${t.due?` — ${fmtJP(t.due)}`:'（期限未定）'}</span>
+      </label>`).join('')}
+    </div>
+    <div class="mbtns" style="justify-content:flex-start;margin-top:-4px">
+      <button class="accentbtn" id="rec-addtasks">課題に追加</button>
+    </div>`;
+  el('rec-addtasks').onclick=()=>{
+    const picked=[...box.querySelectorAll('input:checked')].map(i=>tasks[+i.value]).filter(Boolean);
+    if(!picked.length){toast('追加するものを選んでください');return;}
+    const now=Date.now();
+    for(const t of picked){
+      S.assignments.push({id:uid(),subjectId:r?r.subjectId:null,title:t.title,
+                          due:t.due||null,memo:`${fmtJP(r?r.date:today())}の授業から`,done:false,up:now});
+    }
+    pendingTasks.delete(id);
+    box.innerHTML='';
+    save();
+    toast(`${picked.length}件を課題に追加しました`);
+  };
+}
+
 /* ===================== 授業録音：教科まとめ ===================== */
 let curDigest=null;
 function openDigest(subjectId){
   const s=subjOf(subjectId);if(!s)return;
   curDigest=subjectId;
   const d=S.digests.find(x=>x.subjectId===subjectId);
-  const n=S.recordings.filter(r=>r.subjectId===subjectId&&r.summary).length;
+  const n=S.recordings.filter(r=>r.subjectId===subjectId&&r.hasSummary).length;
+  const fresh=d&&d.ids?S.recordings.filter(r=>r.subjectId===subjectId&&r.hasSummary&&d.ids.indexOf(r.id)<0).length:0;
   el('dg-head').textContent=`✨ ${s.name}のまとめ`;
   el('dg-body').innerHTML=d?mdToHtml(d.text):`<div class="empty" style="padding:6px">まだまとめがありません。<br>要約済みの授業 ${n} 件からまとめを作れます。</div>`;
   el('dg-body').classList.remove('stream');
-  el('dg-status').textContent=d?`${new Date(d.up).toLocaleString('ja-JP')} に ${d.count}件の授業から作成`:'';
-  el('dg-run').textContent=d?'✨ まとめを作り直す':'✨ まとめを作る';
+  el('dg-status').textContent=d
+    ?`${new Date(d.up).toLocaleString('ja-JP')} に ${d.count}件の授業から作成`+(fresh?`・そのあと${fresh}件増えています`:'')
+    :'';
+  el('dg-run').textContent=d?'✨ 新しい授業を足す':'✨ まとめを作る';
   el('dg-run').disabled=!hasKey()||n===0;
+  el('dg-full').classList.toggle('hidden',!d);
+  el('dg-full').disabled=!hasKey()||n===0;
   el('dg-bar').classList.add('hidden');
   el('dg-modal').classList.add('open');
   if(!hasKey())el('dg-status').textContent='設定タブでAPIキーを登録すると作成できます。';
@@ -1798,20 +2420,30 @@ function closeDigest(){
   if(busy){toast('実行中です。終わるまでお待ちください');return;}
   el('dg-modal').classList.remove('open');curDigest=null;
 }
-async function runDigest(){
+async function runDigest(full){
   if(busy||!curDigest)return;
   const s=subjOf(curDigest);if(!s)return;
-  const done=recSorted(S.recordings.filter(r=>r.subjectId===curDigest&&r.summary)).reverse();
-  if(!done.length){toast('要約済みの授業がありません');return;}
+  const all=recSorted(S.recordings.filter(r=>r.subjectId===curDigest&&r.hasSummary)).reverse();
+  if(!all.length){toast('要約済みの授業がありません');return;}
 
-  const material=done.map(r=>`### ${fmtJP(r.date)}　${r.title}\n${r.summary}`).join('\n\n');
+  const prev=S.digests.find(x=>x.subjectId===curDigest);
+  const seen=new Set((prev&&prev.ids)||[]);
+  /* 増分：前回のまとめに入っていない授業だけを渡す */
+  const incremental=!full&&prev&&prev.text&&all.some(r=>seen.has(r.id));
+  const done=incremental?all.filter(r=>!seen.has(r.id)):all;
+  if(incremental&&!done.length){toast('前回のまとめ以降に新しい授業はありません');return;}
+
+  const bodies=[];
+  for(const r of done)bodies.push(`### ${fmtJP(r.date)}　${r.title}\n${(await bodyGet(r.id)).summary}`);
+  const material=(incremental?`【前回までのまとめ】\n${prev.text}\n\n【今回追加する授業】\n`:'')+bodies.join('\n\n');
   const chunks=splitText(material,CHUNK_CHARS*3);
   busy=true;aborter=new AbortController();
   const sig=aborter.signal;
   el('dg-run').disabled=true;
   el('dg-body').classList.add('stream');
   el('dg-body').innerHTML='<span class="caret"></span>';
-  el('dg-status').innerHTML='<span class="spin"></span>まとめを作成中…';
+  el('dg-status').innerHTML=`<span class="spin"></span>${incremental?`新しい${done.length}件を足してまとめ中…`:'まとめを作成中…'}`;
+  let dgCost=0;
   try{
     let src=material;
     if(chunks.length>1){          /* 授業数が多いときは一度圧縮してからまとめる */
@@ -1822,20 +2454,25 @@ async function runDigest(){
         el('dg-bar').querySelector('i').style.width=Math.round(i/(chunks.length+1)*100)+'%';
         el('dg-status').innerHTML=`<span class="spin"></span>要約を読み取り中（${i+1}/${chunks.length}）`;
         const out=await callClaude(SYS.lessonMap(s.name),chunks[i],{effort:'low',signal:sig,maxTokens:8000});
+        dgCost+=out.cost||0;
         parts.push(out.text);
       }
       src=parts.join('\n\n');
     }
     const out=await callClaude(SYS.digest(s.name),src,
       {effort:'medium',signal:sig,maxTokens:16000,onDelta:t2=>{el('dg-body').innerHTML=esc(t2)+'<span class="caret"></span>';}});
-    const prev=S.digests.find(x=>x.subjectId===curDigest);
-    if(prev)Object.assign(prev,{text:out.text,count:done.length,up:Date.now()});
-    else S.digests.push({id:uid(),subjectId:curDigest,text:out.text,count:done.length,up:Date.now()});
+    dgCost+=out.cost||0;
+    const ids=all.map(r=>r.id);
+    const cur=S.digests.find(x=>x.subjectId===curDigest);
+    if(cur)Object.assign(cur,{text:out.text,count:ids.length,ids,up:Date.now()});
+    else S.digests.push({id:uid(),subjectId:curDigest,text:out.text,count:ids.length,ids,up:Date.now()});
     save();
     el('dg-body').classList.remove('stream');
     el('dg-body').innerHTML=mdToHtml(out.text);
-    el('dg-status').textContent=`${done.length}件の授業からまとめました。`;
-    el('dg-run').textContent='✨ まとめを作り直す';
+    el('dg-status').textContent=`${ids.length}件の授業からまとめました`
+      +(incremental?`（新しい${done.length}件を追加）`:'')+`・約 $${dgCost.toFixed(3)}`;
+    el('dg-run').textContent='✨ 新しい授業を足す';
+    el('dg-full').classList.remove('hidden');
   }catch(e){
     const d=S.digests.find(x=>x.subjectId===curDigest);
     el('dg-body').classList.remove('stream');
@@ -1877,17 +2514,18 @@ function loadSumWritten(){try{return JSON.parse(localStorage.getItem(SUM_KEY))||
 async function writeSummaryFiles(){
   if(!dirHandle)return;
   const written=loadSumWritten();
-  const withSum=S.recordings.filter(r=>r.summary);
+  const withSum=S.recordings.filter(r=>r.hasSummary);
   if(!withSum.length&&!S.digests.length)return;
   let root;
   try{root=await dirHandle.getDirectoryHandle('授業要約',{create:true});}catch(e){return;}
   for(const r of withSum){
     if(written[r.id]===r.up)continue;
     try{
+      const b=await bodyGet(r.id);
       const dir=await root.getDirectoryHandle(sanitizeName(subjName(r.subjectId)),{create:true});
       const fh=await dir.getFileHandle(sanitizeName(`${r.date}_${r.title}.md`),{create:true});
       const w=await fh.createWritable();
-      await w.write(`# ${r.title}\n\n${subjName(r.subjectId)} / ${fmtJP(r.date)} / ${fmtDur(r.durationMs)}\n\n${r.summary}\n\n---\n\n## 文字起こし\n\n${r.transcript}\n`);
+      await w.write(`# ${r.title}\n\n${subjName(r.subjectId)} / ${fmtJP(r.date)} / ${fmtDur(r.durationMs)}\n\n${b.summary}\n\n---\n\n## 文字起こし\n\n${b.transcript}\n`);
       await w.close();
       written[r.id]=r.up;
     }catch(e){}
@@ -1912,15 +2550,27 @@ function renderKeySettings(){
   el('k-key').value=AI.apiKey||'';
   el('k-model').innerHTML=MODELS.map(m=>`<option value="${m.id}"${m.id===AI.model?' selected':''}>${esc(m.label)}</option>`).join('');
   el('k-cost').textContent=COST_NOTE[AI.model]||'';
+  renderCost();
+}
+
+/* 実際に使った額（APIレスポンスのトークン数から計算した実測値） */
+function renderCost(){
+  const box=el('k-usage');
+  if(!box)return;
+  const now=new Date(),ym=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const withCost=S.recordings.filter(r=>r.costUSD>0);
+  if(!withCost.length){box.textContent='まだ要約を作っていないため、実績はありません。';return;}
+  const month=withCost.filter(r=>(r.date||'').slice(0,7)===ym);
+  const sum=a=>a.reduce((n,r)=>n+(r.costUSD||0),0);
+  const mCost=sum(month),tCost=sum(withCost);
+  const avg=tCost/withCost.length;
+  box.innerHTML=`今月 <b>$${mCost.toFixed(2)}</b>（${month.length}コマ）　/　累計 <b>$${tCost.toFixed(2)}</b>（${withCost.length}コマ）　/　1コマ平均 $${avg.toFixed(3)}`;
 }
 
 /* ===================== イベント ===================== */
 function bindEvents(){
   /* タブ */
-  document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
-    document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===t));
-    for(const p of['tasks','notes','voice','subjects','settings'])el('panel-'+p).classList.toggle('hidden',p!==t.dataset.tab);
-  }));
+  document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>setTab(t.dataset.tab)));
   /* 今日のTODO */
   el('btn-todo-claude').addEventListener('click',todoToClaude);
   el('btn-todo-copy').addEventListener('click',copyTodo);
@@ -1972,6 +2622,12 @@ function bindEvents(){
   });
   el('v-stop').addEventListener('click',()=>stopRec(true));
   el('fv-subj').addEventListener('change',renderVoice);
+  let sTimer=null;
+  el('v-search').addEventListener('input',e=>{
+    const q=e.target.value;
+    clearTimeout(sTimer);
+    sTimer=setTimeout(()=>runSearch(q).catch(err=>console.warn(err)),200);
+  });
   el('v-list').addEventListener('click',e=>{
     const dg=e.target.closest('[data-digest]');
     if(dg){openDigest(dg.dataset.digest);return;}
@@ -1982,19 +2638,21 @@ function bindEvents(){
   el('rec-close').addEventListener('click',closeRec);
   el('rec-modal').addEventListener('click',e=>{if(e.target===el('rec-modal'))closeRec();});
   el('rec-text').addEventListener('input',()=>{el('rec-textcount').textContent=`${el('rec-text').value.length.toLocaleString()} 文字`;});
-  el('rec-sum').addEventListener('click',()=>{saveRecEdits();summarizeRec(curRec);});
+  el('rec-sum').addEventListener('click',async()=>{await saveRecEdits();summarizeRec(curRec);});
   el('rec-abort').addEventListener('click',()=>{if(aborter)aborter.abort();});
-  el('rec-save').addEventListener('click',()=>{saveRecEdits();toast('保存しました');closeRec();});
-  el('rec-copy').addEventListener('click',()=>{
+  el('rec-save').addEventListener('click',async()=>{await saveRecEdits();toast('保存しました');closeRec();});
+  el('rec-copy').addEventListener('click',async()=>{
     const r=getRec(curRec);if(!r)return;
-    copyToClipboard(r.summary?`【${r.title}】${subjName(r.subjectId)}・${fmtJP(r.date)}\n\n${r.summary}`:r.transcript);
+    const b=await bodyGet(r.id);
+    copyToClipboard(b.summary?`【${r.title}】${subjName(r.subjectId)}・${fmtJP(r.date)}\n\n${b.summary}`:b.transcript);
   });
-  el('rec-share').addEventListener('click',()=>{
+  el('rec-share').addEventListener('click',async()=>{
     const r=getRec(curRec);if(!r)return;
-    saveRecEdits();
-    shareText(r.summary
-      ?`【${r.title}】${subjName(r.subjectId)}・${fmtJP(r.date)}\n\n${r.summary}`
-      :recPromptText(r),'コピーしました（Claudeに貼り付けてください）');
+    await saveRecEdits();
+    const b=await bodyGet(r.id);
+    shareText(b.summary
+      ?`【${r.title}】${subjName(r.subjectId)}・${fmtJP(r.date)}\n\n${b.summary}`
+      :recPromptText(r,b.transcript),'コピーしました（Claudeに貼り付けてください）');
   });
   el('rec-del').addEventListener('click',()=>{
     const r=getRec(curRec);if(!r)return;
@@ -2002,13 +2660,79 @@ function bindEvents(){
     if(!confirm(`「${r.title}」を削除しますか？文字起こしと要約が消えます。`))return;
     S.deleted[r.id]=Date.now();
     S.recordings=S.recordings.filter(x=>x.id!==r.id);
+    bodyDel(r.id).catch(()=>{});
     el('rec-modal').classList.remove('open');curRec=null;
     save();toast('削除しました');
   });
+  /* 文字起こしの編集画面 */
+  el('rec-edit').addEventListener('click',()=>{if(curRec)openEditor(curRec);});
+  el('ed-find').addEventListener('input',edCountHits);
+  el('ed-next').addEventListener('click',edFindNext);
+  el('ed-one').addEventListener('click',()=>{
+    const ta=el('ed-text'),f=el('ed-find').value;
+    if(!f)return;
+    if(ta.value.slice(ta.selectionStart,ta.selectionEnd)!==f){edFindNext();return;}
+    const s=ta.selectionStart;
+    ta.value=ta.value.slice(0,s)+el('ed-repl').value+ta.value.slice(ta.selectionEnd);
+    ta.setSelectionRange(s+el('ed-repl').value.length,s+el('ed-repl').value.length);
+    edCountHits();el('ed-count').textContent=`${ta.value.length.toLocaleString()} 文字`;
+  });
+  el('ed-all').addEventListener('click',()=>{
+    const ta=el('ed-text'),f=el('ed-find').value;
+    if(!f){toast('探す語を入れてください');return;}
+    const n=ta.value.split(f).length-1;
+    if(!n){toast('見つかりません');return;}
+    if(!confirm(`「${f}」${n}件を「${el('ed-repl').value}」に置き換えます。よろしいですか？`))return;
+    ta.value=ta.value.split(f).join(el('ed-repl').value);
+    edCountHits();el('ed-count').textContent=`${ta.value.length.toLocaleString()} 文字`;
+    toast(`${n}件を置き換えました`);
+  });
+  el('ed-text').addEventListener('input',()=>{el('ed-count').textContent=`${el('ed-text').value.length.toLocaleString()} 文字`;});
+  el('ed-save').addEventListener('click',async()=>{
+    const r=getRec(edId);if(!r)return;
+    const text=el('ed-text').value;
+    await bodySet(edId,{transcript:text});
+    r.chars=text.length;r.up=Date.now();
+    if(curRec===edId){el('rec-text').value=text;el('rec-textcount').textContent=`${text.length.toLocaleString()} 文字`;}
+    el('ed-modal').classList.remove('open');edId=null;
+    save();toast('保存しました');
+  });
+  el('ed-cancel').addEventListener('click',()=>{
+    if(el('ed-text').value!==edOrig&&!confirm('変更を破棄して閉じますか？'))return;
+    el('ed-modal').classList.remove('open');edId=null;
+  });
+
+  /* 時間割 */
+  el('tt-add').addEventListener('click',()=>{
+    const subjectId=el('tt-subj').value;
+    if(!subjectId){toast('先に教科を追加してください');return;}
+    const day=+el('tt-day').value,period=+el('tt-period').value;
+    S.timetable=S.timetable.filter(t=>!(t.day===day&&t.period===period));
+    S.timetable.push({id:uid(),day,period,subjectId,up:Date.now()});
+    save();toast(`${WD[day]}曜${period}限に登録しました`);
+  });
+  el('tt-grid').addEventListener('click',e=>{
+    const b=e.target.closest('[data-rm]');if(!b)return;
+    const t=S.timetable.find(x=>x.id===b.dataset.rm);if(!t)return;
+    if(!confirm(`${WD[t.day]}曜${t.period}限の${subjName(t.subjectId)}を削除しますか？`))return;
+    S.deleted[t.id]=Date.now();
+    S.timetable=S.timetable.filter(x=>x.id!==t.id);
+    save();
+  });
+  el('tt-times').addEventListener('change',e=>{
+    const i=e.target.closest('input[data-pn]');if(!i)return;
+    const p=PERIODS.find(p=>p.n===+i.dataset.pn);if(!p)return;
+    p[i.dataset.f]=i.value;savePeriods();renderTimetable();
+  });
+
   /* 教科まとめ */
   el('dg-close').addEventListener('click',closeDigest);
   el('dg-modal').addEventListener('click',e=>{if(e.target===el('dg-modal'))closeDigest();});
-  el('dg-run').addEventListener('click',runDigest);
+  el('dg-run').addEventListener('click',()=>runDigest(false));
+  el('dg-full').addEventListener('click',()=>{
+    if(!confirm('すべての授業を読み直してまとめを作り直します。授業数に応じて費用がかかります。よろしいですか？'))return;
+    runDigest(true);
+  });
   el('dg-copy').addEventListener('click',()=>{
     const d=S.digests.find(x=>x.subjectId===curDigest);
     if(d)copyToClipboard(`【${subjName(curDigest)}のまとめ】\n\n${d.text}`);
@@ -2073,6 +2797,7 @@ function bindEvents(){
   el('cl-close').addEventListener('click',closeClaude);
   el('cl-modal').addEventListener('click',e=>{if(e.target===el('cl-modal'))closeClaude();});
   el('cl-modal').querySelectorAll('.presets .mini').forEach(b=>b.addEventListener('click',()=>{el('cl-q').value=b.dataset.q;}));
+  el('cl-sum').addEventListener('click',summarizeNotes);
   el('cl-share').addEventListener('click',shareToClaude);
   el('cl-copy').addEventListener('click',copyPrompt);
   el('cl-open').addEventListener('click',openClaudeWeb);
@@ -2090,9 +2815,10 @@ function bindEvents(){
     if(!confirm('すべてのデータ（教科・課題・ノートファイル・授業録音）を削除します。よろしいですか？'))return;
     if(!confirm('本当に削除しますか？この操作は取り消せません。'))return;
     const now=Date.now();
-    for(const x of[...S.subjects,...S.assignments,...S.recordings,...S.digests])S.deleted[x.id]=now;
+    for(const x of[...S.subjects,...S.assignments,...S.recordings,...S.digests,...S.noteSummaries,...S.timetable])S.deleted[x.id]=now;
     for(const f of FILES)S.deleted[f.id]=now;
-    S.subjects=[];S.assignments=[];S.recordings=[];S.digests=[];
+    for(const r of S.recordings)await bodyDel(r.id).catch(()=>{});
+    S.subjects=[];S.assignments=[];S.recordings=[];S.digests=[];S.timetable=[];S.noteSummaries=[];
     for(const f of FILES)await idbDel(f.id);
     await refreshFiles();
     save();
@@ -2113,7 +2839,11 @@ function bindEvents(){
   updateRecUI();renderLive();updateRecHealth();
   if(!speechCtor())showRecError('このブラウザは音声認識に対応していません。iPhoneはSafari、AndroidはChromeで開いてください。');
   await refreshFiles().catch(e=>console.warn(e));
+  const moved=await migrateBodies().catch(e=>{console.warn(e);return 0;});
   renderAll();
+  if(moved)toast(`${moved}件の文字起こしを新しい保存先へ移しました`);
+  applyCurrentSlot();
+  checkDraft().catch(e=>console.warn(e));
   restoreFolder();
   /* 公開サイト(https)ではオフライン対応のService Workerを登録 */
   if('serviceWorker' in navigator&&location.protocol==='https:'){
