@@ -157,6 +157,51 @@ details.donewrap summary{cursor:pointer;color:var(--muted);font-size:13px;font-w
 .danger-btn{background:transparent;border:1px solid rgba(255,93,108,.5);color:var(--danger);padding:8px 13px;border-radius:9px;cursor:pointer;font-size:13px;font-family:inherit;touch-action:manipulation}
 .danger-btn:hover{background:rgba(255,93,108,.1)}
 .setrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+/* ---- 授業録音 ---- */
+.recwrap{display:flex;flex-direction:column;align-items:center;gap:12px;padding:4px 0 2px}
+.recbtn{width:124px;height:124px;border-radius:50%;border:none;cursor:pointer;font-family:inherit;
+  background:linear-gradient(180deg,#6bb4ff,#3a7fd5);color:#06192e;font-size:15px;font-weight:800;letter-spacing:.05em;
+  box-shadow:0 8px 30px rgba(79,157,255,.28);touch-action:manipulation;user-select:none;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;transition:transform .08s}
+.recbtn:active{transform:scale(.97)}
+.recbtn:disabled{opacity:.45;cursor:default}
+.recbtn.on{background:linear-gradient(180deg,#ff7280,#e0434f);color:#26080c;box-shadow:0 8px 30px rgba(255,93,108,.32);animation:pulse 1.8s ease-in-out infinite}
+.recbtn.pause{background:linear-gradient(180deg,#ffc46b,#e39421);color:#2a1a02;animation:none}
+.recbtn .ico{font-size:28px;line-height:1}
+@keyframes pulse{0%,100%{box-shadow:0 8px 30px rgba(255,93,108,.3)}50%{box-shadow:0 8px 42px rgba(255,93,108,.58)}}
+.rectimer{font-size:29px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:.04em}
+.rectimer.idle{color:var(--muted)}
+.rechealth{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted)}
+.rechealth .dot{width:8px;height:8px;border-radius:50%;background:#3a4060;flex:none}
+.rechealth .dot.live{background:var(--ok);box-shadow:0 0 8px var(--ok);animation:blink 1.6s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+.livebox{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:12px;min-height:104px;max-height:40vh;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;white-space:pre-wrap;word-break:break-word;font-size:15px;line-height:1.7}
+.livebox .interim{color:var(--muted)}
+.livebox .ph{color:var(--muted);font-size:13px}
+.ritem{display:flex;gap:11px;padding:11px 12px;background:var(--panel2);border:1px solid var(--border);border-radius:12px;align-items:flex-start;cursor:pointer}
+.ritem:hover{border-color:#4a5172}
+.ritem .rmain{flex:1;min-width:0}
+.ritem .rtitle{font-weight:700;font-size:14.5px;word-break:break-word}
+.ritem .rmeta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px;font-size:12px;color:var(--muted)}
+.okbadge{font-size:11px;padding:1px 9px;border-radius:999px;font-weight:700;border:1px solid rgba(61,220,132,.5);color:var(--ok);background:rgba(61,220,132,.1)}
+.nobadge{font-size:11px;padding:1px 9px;border-radius:999px;font-weight:700;border:1px solid #3a4060;color:var(--muted)}
+.sumbody{font-size:14.5px;line-height:1.75;word-break:break-word}
+.sumbody h4{font-size:13.5px;margin:14px 0 5px;color:var(--accent)}
+.sumbody h4:first-child{margin-top:0}
+.sumbody ul{margin:5px 0;padding-left:1.25em}
+.sumbody li{margin:3px 0}
+.sumbody p{margin:7px 0}
+.sumbody strong{color:#fff}
+.sumbody.stream{white-space:pre-wrap}
+.caret{display:inline-block;width:8px;height:1.05em;background:var(--accent);vertical-align:-2px;animation:blink 1s step-end infinite}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.25);border-top-color:var(--accent);border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px;margin-right:7px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.pbar{height:5px;background:#0d1018;border-radius:3px;overflow:hidden;margin-top:8px}
+.pbar i{display:block;height:100%;background:var(--accent);border-radius:3px;transition:width .25s}
+.alertbox{border-radius:11px;padding:10px 13px;font-size:13px;margin-bottom:12px;border:1px solid}
+.alertbox.err{background:rgba(255,93,108,.1);border-color:rgba(255,93,108,.4);color:#ffb6bd}
+.alertbox.warn{background:rgba(255,180,84,.1);border-color:rgba(255,180,84,.38);color:#ffd9a3}
 #toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:#222842;border:1px solid #3a4060;color:#fff;padding:10px 18px;border-radius:999px;font-size:13.5px;font-weight:600;opacity:0;pointer-events:none;transition:all .25s;z-index:99;max-width:88vw;text-align:center}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .hidden{display:none!important}
@@ -177,6 +222,7 @@ details.donewrap summary{cursor:pointer;color:var(--muted);font-size:13px;font-w
   <div class="tabs">
     <button class="tab active" data-tab="tasks">📝 課題 <span class="nbadge calm" id="task-badge">0</span></button>
     <button class="tab" data-tab="notes">📒 ノート</button>
+    <button class="tab" data-tab="voice">🎙️ 授業録音</button>
     <button class="tab" data-tab="subjects">📖 教科</button>
     <button class="tab" data-tab="settings">⚙️ 設定</button>
   </div>
@@ -246,6 +292,40 @@ details.donewrap summary{cursor:pointer;color:var(--muted);font-size:13px;font-w
     </div>
   </section>
 
+  <!-- ============ 授業録音 ============ -->
+  <section id="panel-voice" class="hidden">
+    <div class="alertbox err hidden" id="v-support"></div>
+
+    <div class="card">
+      <h2>🎙️ 授業を録音する</h2>
+      <div class="frow c3">
+        <div><label>教科 *</label><select id="v-subj"></select></div>
+        <div><label>日付</label><input type="date" id="v-date"></div>
+        <div class="span2"><label>タイトル（任意）</label><input type="text" id="v-title" placeholder="例: 三角関数の加法定理"></div>
+      </div>
+      <div class="recwrap">
+        <button class="recbtn" id="v-btn"><span class="ico">●</span><span id="v-btnlabel">録音開始</span></button>
+        <div class="rectimer idle" id="v-timer">00:00</div>
+        <div class="rechealth"><span class="dot" id="v-dot"></span><span id="v-health">待機中</span></div>
+        <button class="accentbtn hidden" id="v-stop">停止して保存</button>
+      </div>
+      <div class="mnote" id="v-hint">マイクの使用を許可してください。録音中は画面を消したり他のアプリに切り替えると認識が止まります。</div>
+    </div>
+
+    <div class="card">
+      <h2>文字起こし <span class="countb" id="v-count">0 文字</span></h2>
+      <div class="livebox" id="v-live"><span class="ph">ここに認識結果がリアルタイムで表示されます。</span></div>
+    </div>
+
+    <div class="card">
+      <h2>録音した授業 <span class="countb" id="v-listcount"></span></h2>
+      <div class="filters">
+        <select id="fv-subj"><option value="all">すべての教科</option></select>
+      </div>
+      <div id="v-list"></div>
+    </div>
+  </section>
+
   <!-- ============ 教科 ============ -->
   <section id="panel-subjects" class="hidden">
     <div class="card">
@@ -275,6 +355,13 @@ details.donewrap summary{cursor:pointer;color:var(--muted);font-size:13px;font-w
           <li>日付の横の <b>「Claudeに質問」</b> ボタンを押す</li>
           <li>質問を選んで <b>「共有する」</b> → 共有シートで <b>Claudeアプリ</b> を選ぶと、写真と質問文がそのまま送れます</li>
         </ol>
+        <b>🎙️ 授業録音から要約をつくる</b>
+        <ol>
+          <li>授業録音タブで <b>教科を選んで</b>「録音開始」（教科ごとに整理されます）</li>
+          <li>授業が終わったら「停止して保存」。APIキーを登録済みなら <b>そのまま要約まで自動</b> で作られます</li>
+          <li>同じ教科の授業がたまったら「<b>✨ 教科まとめ</b>」でテスト対策用の総まとめが作れます</li>
+          <li>APIキーが無くても録音・文字起こしは使えます（「Claudeアプリへ送る」で手動要約）</li>
+        </ol>
         <b>💻 PC（Claude Code）の場合</b>
         <ol>
           <li>下の「フォルダ連携」で <span class="kbd">claude 君用</span> 内の <span class="kbd">学習データ</span> フォルダを連携</li>
@@ -282,6 +369,22 @@ details.donewrap summary{cursor:pointer;color:var(--muted);font-size:13px;font-w
           <li>Claude Codeに「<b>今日のノートをまとめて</b>」「<b>学習データの6/12の数学プリントを解説して</b>」のように話しかけるだけでOK</li>
         </ol>
       </div>
+    </div>
+
+    <div class="card">
+      <h2>🔑 Claude APIキー（授業録音の自動要約用）</h2>
+      <div class="mnote" style="margin:0 0 10px">登録すると、録音した授業の要約をアプリ内で自動作成できます。<b>未登録でも録音・文字起こしは使えます</b>（要約はClaudeアプリへ共有）。キーはこの端末内だけに保存され、送信先はAnthropicのみです。共有端末では登録しないでください。</div>
+      <div class="frow c2">
+        <div><label>APIキー（sk-ant-… ）</label><input type="password" id="k-key" placeholder="sk-ant-api03-..." autocomplete="off"></div>
+        <div><label>使うモデル</label><select id="k-model"></select></div>
+      </div>
+      <div class="setrow">
+        <button class="accentbtn" id="k-save">保存</button>
+        <button class="ghost" id="k-test">接続テスト</button>
+        <button class="danger-btn" id="k-clear">キーを削除</button>
+      </div>
+      <div class="mnote" id="k-status" style="margin:0"></div>
+      <div class="mnote" id="k-cost"></div>
     </div>
 
     <div class="card">
@@ -364,6 +467,58 @@ details.donewrap summary{cursor:pointer;color:var(--muted);font-size:13px;font-w
   </div>
 </div>
 
+<!-- 録音の詳細 -->
+<div class="overlay" id="rec-modal">
+  <div class="modal">
+    <h3 id="rec-head">授業の記録</h3>
+    <div class="frow c2">
+      <div><label>教科</label><select id="rec-subj"></select></div>
+      <div><label>日付</label><input type="date" id="rec-date"></div>
+    </div>
+    <div class="frow"><div><label>タイトル</label><input type="text" id="rec-title"></div></div>
+
+    <label>要約</label>
+    <div class="alertbox warn hidden" id="rec-keynote">設定タブで Claude の API キーを登録すると、要約をこのアプリ内で自動作成できます。未登録でも「Claudeアプリへ送る」で手動要約できます。</div>
+    <div class="sumbody" id="rec-summary" style="background:var(--panel2);border:1px solid var(--border);border-radius:11px;padding:12px;margin-bottom:10px"></div>
+    <div class="mbtns" style="justify-content:flex-start">
+      <button class="accentbtn" id="rec-sum">✨ 要約を作る</button>
+      <button class="claudebtn2" id="rec-share">📤 Claudeアプリへ送る</button>
+      <button class="mini" id="rec-copy">コピー</button>
+      <button class="danger-btn hidden" id="rec-abort">中止</button>
+    </div>
+    <div class="mnote" id="rec-status"></div>
+    <div class="pbar hidden" id="rec-bar"><i style="width:0%"></i></div>
+
+    <details style="margin-top:14px">
+      <summary style="cursor:pointer;color:var(--muted);font-size:13px;font-weight:700">文字起こしを見る・直す</summary>
+      <textarea id="rec-text" rows="9" style="margin-top:9px"></textarea>
+      <div class="mnote" id="rec-textcount"></div>
+    </details>
+
+    <div class="mbtns" style="margin-top:14px">
+      <button class="mini save" id="rec-save">保存して閉じる</button>
+      <button class="danger-btn" id="rec-del">削除</button>
+      <button class="mini" id="rec-close">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<!-- 教科まとめ -->
+<div class="overlay" id="dg-modal">
+  <div class="modal">
+    <h3 id="dg-head">教科のまとめ</h3>
+    <div class="sumbody" id="dg-body" style="background:var(--panel2);border:1px solid var(--border);border-radius:11px;padding:12px"></div>
+    <div class="mnote" id="dg-status"></div>
+    <div class="pbar hidden" id="dg-bar"><i style="width:0%"></i></div>
+    <div class="mbtns">
+      <button class="accentbtn" id="dg-run">✨ まとめを作り直す</button>
+      <button class="mini" id="dg-copy">コピー</button>
+      <button class="claudebtn2" id="dg-share">📤 共有</button>
+      <button class="mini" id="dg-close">閉じる</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -391,9 +546,9 @@ function toast(msg){const t=el('toast');t.textContent=msg;t.classList.add('show'
 let S=loadState();
 function loadState(){
   try{const d=JSON.parse(localStorage.getItem(LS_KEY));
-    if(d&&Array.isArray(d.subjects))return {subjects:d.subjects,assignments:d.assignments||[],deleted:d.deleted||{}};
+    if(d&&Array.isArray(d.subjects))return {subjects:d.subjects,assignments:d.assignments||[],recordings:d.recordings||[],digests:d.digests||[],deleted:d.deleted||{}};
   }catch(e){}
-  return {subjects:[],assignments:[],deleted:{}};
+  return {subjects:[],assignments:[],recordings:[],digests:[],deleted:{}};
 }
 function persist(){localStorage.setItem(LS_KEY,JSON.stringify(S));}
 function save(){persist();renderAll();scheduleFolderSync();}
@@ -407,7 +562,8 @@ function mergeData(d){
   let ch=0;
   const del={...S.deleted};
   for(const[k,v]of Object.entries(d.deleted||{})){if(!del[k]||v>del[k]){del[k]=v;ch++;}}
-  for(const key of['subjects','assignments']){
+  for(const key of['subjects','assignments','recordings','digests']){
+    if(!Array.isArray(S[key]))S[key]=[];
     const map=new Map(S[key].map(x=>[x.id,x]));
     for(const it of(d[key]||[])){
       if(!it||!it.id)continue;
@@ -500,7 +656,7 @@ async function deleteFile(id){
 }
 
 /* ===================== レンダリング ===================== */
-function renderAll(){renderSubjectSelects();renderTodo();renderAssignments();renderNotes();renderSubjects();renderSettings();}
+function renderAll(){renderSubjectSelects();renderTodo();renderAssignments();renderNotes();renderVoice();renderSubjects();renderSettings();}
 
 /* ===================== 今日のTODO ===================== */
 function todoItems(){
@@ -602,6 +758,9 @@ function renderSubjectSelects(){
   keep(el('n-subj'),`<option value="">未分類</option>`+opts);
   keep(el('f-subj'),`<option value="all">すべての教科</option>`+opts);
   keep(el('fn-subj'),`<option value="all">すべての教科</option>`+opts);
+  keep(el('v-subj'),`<option value="">未分類</option>`+opts);
+  keep(el('rec-subj'),`<option value="">未分類</option>`+opts);
+  keep(el('fv-subj'),`<option value="all">すべての教科</option>`+opts);
 }
 
 function assignItemHTML(a){
@@ -700,10 +859,11 @@ function renderSubjects(){
     el('subj-list').innerHTML=S.subjects.map(s=>{
       const na=S.assignments.filter(a=>a.subjectId===s.id&&!a.done).length;
       const nf=FILES.filter(f=>f.subjectId===s.id).length;
+      const nr=S.recordings.filter(r=>r.subjectId===s.id).length;
       return `<div class="sitem" data-id="${s.id}">
         <span class="sdot" style="background:${s.color}"></span>
         <span class="sname">${esc(s.name)}</span>
-        <span class="scnt">課題${na}・ノート${nf}</span>
+        <span class="scnt">課題${na}・ノート${nf}・録音${nr}</span>
         <button class="icon-btn" data-act="sdel" aria-label="削除">🗑</button>
       </div>`;
     }).join('');
@@ -715,7 +875,7 @@ function renderSubjects(){
 }
 
 function renderSettings(){
-  el('data-stat').textContent=`教科 ${S.subjects.length} ・ 課題 ${S.assignments.length} ・ ノートファイル ${FILES.length}件（合計 ${fmtSize(FILES.reduce((a,f)=>a+(f.size||0),0))}）`;
+  el('data-stat').textContent=`教科 ${S.subjects.length} ・ 課題 ${S.assignments.length} ・ ノートファイル ${FILES.length}件（合計 ${fmtSize(FILES.reduce((a,f)=>a+(f.size||0),0))}） ・ 授業録音 ${S.recordings.length}件（要約済み ${S.recordings.filter(r=>r.summary).length}）`;
   el('exp-size').textContent=FILES.length?`(約${fmtSize(Math.round(FILES.reduce((a,f)=>a+(f.size||0),0)*1.37))})`:'';
   const st=el('folder-stat'),btn=el('btn-folder'),off=el('btn-folder-off'),hd=el('syncstat');
   if(dirHandle){st.textContent=`連携中: ${dirHandle.name}`;btn.textContent='別のフォルダに変更';off.classList.remove('hidden');hd.textContent=`📂 ${dirHandle.name} と同期中`;hd.classList.add('on');}
@@ -782,13 +942,17 @@ function deleteSubject(id){
   const s=subjOf(id);if(!s)return;
   const na=S.assignments.filter(a=>a.subjectId===id).length;
   const nf=FILES.filter(f=>f.subjectId===id).length;
+  const nr=S.recordings.filter(r=>r.subjectId===id).length;
   let msg=`教科「${s.name}」を削除しますか？`;
-  if(na||nf)msg+=`\n（課題${na}件は一緒に削除、ノート${nf}件は「未分類」になります）`;
+  if(na||nf||nr)msg+=`\n（課題${na}件は一緒に削除、ノート${nf}件と録音${nr}件は「未分類」になります）`;
   if(!confirm(msg))return;
   const now=Date.now();
   S.deleted[id]=now;
   for(const a of S.assignments.filter(a=>a.subjectId===id))S.deleted[a.id]=now;
   S.assignments=S.assignments.filter(a=>a.subjectId!==id);
+  for(const d of S.digests.filter(d=>d.subjectId===id))S.deleted[d.id]=now;   // まとめは教科に紐づくので削除
+  S.digests=S.digests.filter(d=>d.subjectId!==id);
+  for(const r of S.recordings.filter(r=>r.subjectId===id)){r.subjectId=null;r.up=now;}  // 文字起こしは残す
   S.subjects=S.subjects.filter(x=>x.id!==id);
   (async()=>{
     for(const f of FILES.filter(f=>f.subjectId===id)){f.subjectId=null;f.up=Date.now();await idbPut(f);}
@@ -928,7 +1092,8 @@ async function folderSync(absorb){
     if(absorb)await absorbFolderJSON();
     /* データJSON書き出し（ファイル本体は実ファイルとして別に保存するのでメタのみ） */
     const meta=FILES.map(f=>({id:f.id,name:f.name,type:f.type,size:f.size,date:f.date,subjectId:f.subjectId,up:f.up}));
-    const json=JSON.stringify({app:APP_TAG,ver:1,exportedAt:new Date().toISOString(),subjects:S.subjects,assignments:S.assignments,deleted:S.deleted,files:meta},null,1);
+    const json=JSON.stringify({app:APP_TAG,ver:1,exportedAt:new Date().toISOString(),subjects:S.subjects,assignments:S.assignments,recordings:S.recordings,digests:S.digests,deleted:S.deleted,files:meta},null,1);
+    await writeSummaryFiles();
     const fh=await dirHandle.getFileHandle('学習データ.json',{create:true});
     const w=await fh.createWritable();await w.write(json);await w.close();
     await writeNoteFiles();
@@ -1003,7 +1168,7 @@ function dataURLtoBlob(u){
   return new Blob([arr],{type:mime});
 }
 async function buildExport(includeFiles){
-  const o={app:APP_TAG,ver:1,exportedAt:new Date().toISOString(),subjects:S.subjects,assignments:S.assignments,deleted:S.deleted};
+  const o={app:APP_TAG,ver:1,exportedAt:new Date().toISOString(),subjects:S.subjects,assignments:S.assignments,recordings:S.recordings,digests:S.digests,deleted:S.deleted};
   o.files=[];
   for(const f of FILES){
     const m={id:f.id,name:f.name,type:f.type,size:f.size,date:f.date,subjectId:f.subjectId,up:f.up};
@@ -1062,12 +1227,699 @@ async function importFile(file){
   }catch(e){toast('読み込みに失敗しました');console.warn(e);}
 }
 
+/* ===================== 授業録音：設定とClaude API ===================== */
+const LS_AI='study-manager-ai-v1';
+const MODELS=[
+  {id:'claude-sonnet-5',  label:'Sonnet 5（推奨・バランス）',   effort:true },
+  {id:'claude-opus-5',    label:'Opus 5（最高精度・高価）',      effort:true },
+  {id:'claude-haiku-4-5', label:'Haiku 4.5（最安・速い）',       effort:false},
+];
+const COST_NOTE={
+  'claude-sonnet-5':'50分の授業1コマあたり およそ $0.18（約28円）。',
+  'claude-opus-5':'50分の授業1コマあたり およそ $0.44（約68円）。Sonnet 5 の約2.5倍です。',
+  'claude-haiku-4-5':'50分の授業1コマあたり およそ $0.09（約14円）。安いぶん要約の粒度は落ちます。',
+};
+let AI=loadAI();
+function loadAI(){
+  let d={};
+  try{d=JSON.parse(localStorage.getItem(LS_AI)||'{}')||{};}catch(e){}
+  return Object.assign({apiKey:'',model:'claude-sonnet-5'},d);
+}
+function saveAI(){try{localStorage.setItem(LS_AI,JSON.stringify(AI));}catch(e){toast('設定の保存に失敗しました');}}
+function hasKey(){return !!(AI.apiKey||'').trim();}
+function modelInfo(id){return MODELS.find(m=>m.id===(id||AI.model))||MODELS[0];}
+
+const CHUNK_CHARS=3500;
+
+function splitSentences(p){
+  const out=[];let cur='';
+  for(const ch of p){cur+=ch;if('。．.!?！？\n'.indexOf(ch)>=0){out.push(cur);cur='';}}
+  if(cur)out.push(cur);
+  return out;
+}
+function splitText(t,size){
+  t=String(t);
+  if(t.length<=size)return[t];
+  const out=[];let cur='';
+  const push=()=>{if(cur.trim())out.push(cur.trim());cur='';};
+  for(const p of t.split(/\n{2,}/)){
+    if(cur&&(cur+'\n\n'+p).length<=size){cur+='\n\n'+p;continue;}
+    if(!cur&&p.length<=size){cur=p;continue;}
+    push();
+    if(p.length<=size){cur=p;continue;}
+    for(const s of splitSentences(p)){
+      if(cur&&(cur+s).length>size)push();
+      if(s.length>size){push();for(let i=0;i<s.length;i+=size)out.push(s.slice(i,i+size));continue;}
+      cur+=s;
+    }
+  }
+  push();
+  return out.length?out:[t];
+}
+
+/* 見出し・箇条書きだけの軽量Markdown描画 */
+function mdToHtml(src){
+  const lines=String(src||'').replace(/\r/g,'').split('\n');
+  const out=[];let ul=false,para=[];
+  const inline=t=>esc(t).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  const flushP=()=>{if(para.length){out.push('<p>'+para.map(inline).join('<br>')+'</p>');para=[];}};
+  const closeUl=()=>{if(ul){out.push('</ul>');ul=false;}};
+  for(const raw of lines){
+    const line=raw.replace(/\s+$/,'');
+    if(!line.trim()){flushP();closeUl();continue;}
+    const h=/^(#{1,4})\s+(.+)$/.exec(line);
+    const li=/^\s*(?:[-*・]|\d+[.)])\s+(.+)$/.exec(line);
+    if(h){flushP();closeUl();out.push('<h4>'+inline(h[2])+'</h4>');continue;}
+    if(li){flushP();if(!ul){out.push('<ul>');ul=true;}out.push('<li>'+inline(li[1])+'</li>');continue;}
+    closeUl();para.push(line);
+  }
+  flushP();closeUl();
+  return out.join('')||'<div class="empty" style="padding:6px">まだ要約がありません</div>';
+}
+
+let aborter=null;
+async function callClaude(system,user,opt){
+  opt=opt||{};
+  const key=(AI.apiKey||'').trim();
+  if(!key)throw new Error('APIキーが未設定です。');
+  const info=modelInfo();
+  const body={model:info.id,max_tokens:opt.maxTokens||16000,system,messages:[{role:'user',content:user}],stream:true};
+  if(info.effort)body.output_config={effort:opt.effort||'medium'};
+
+  let res;
+  try{
+    res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',signal:opt.signal,
+      headers:{'content-type':'application/json','x-api-key':key,
+               'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify(body),
+    });
+  }catch(e){
+    if(e.name==='AbortError')throw e;
+    throw new Error('通信できませんでした。ネット接続を確認してください。');
+  }
+  if(!res.ok){
+    let msg=`エラー ${res.status}`;
+    try{const j=await res.json();if(j&&j.error&&j.error.message)msg+='：'+j.error.message;}catch(e){}
+    if(res.status===401)msg='APIキーが正しくないようです（401）。';
+    if(res.status===429)msg='リクエストが多すぎます。少し待って再実行してください（429）。';
+    if(res.status===529)msg='サーバーが混雑しています。少し待って再実行してください（529）。';
+    throw new Error(msg);
+  }
+
+  const reader=res.body.getReader(),dec=new TextDecoder();
+  let buf='',text='',stop=null;
+  for(;;){
+    const{done,value}=await reader.read();
+    if(done)break;
+    buf+=dec.decode(value,{stream:true});
+    let nl;
+    while((nl=buf.indexOf('\n'))>=0){
+      const line=buf.slice(0,nl).trim();buf=buf.slice(nl+1);
+      if(!line||line.indexOf('data:')!==0)continue;
+      let ev;try{ev=JSON.parse(line.slice(5).trim());}catch(e){continue;}
+      if(ev.type==='content_block_delta'&&ev.delta&&ev.delta.type==='text_delta'){
+        text+=ev.delta.text;
+        if(opt.onDelta)opt.onDelta(text);
+      }else if(ev.type==='message_delta'&&ev.delta&&ev.delta.stop_reason){
+        stop=ev.delta.stop_reason;
+      }else if(ev.type==='error'){
+        throw new Error((ev.error&&ev.error.message)||'ストリーミング中にエラーが発生しました。');
+      }
+    }
+  }
+  if(stop==='refusal')throw new Error('この内容には回答できないと判断されました。');
+  text=text.trim();
+  if(!text)throw new Error('応答が空でした。もう一度お試しください。');
+  return{text,truncated:stop==='max_tokens'};
+}
+
+/* ---------- 授業向けプロンプト ---------- */
+const SYS={
+  lesson:sub=>
+`あなたは授業の記録をまとめる学習アシスタントです。渡された文字起こしは${sub}の授業を音声認識したもので、句読点がなく、言い間違いや誤認識が含まれます。
+
+次の見出しで日本語でまとめてください。該当する内容がない見出しは「特になし」と書いてください。
+
+## 今日の要点
+授業の中心になった内容を3〜6項目の箇条書きで。
+
+## 重要な用語・公式
+「用語 — 説明」の形で箇条書きに。数式は読んで分かる形で正確に書く。
+
+## 先生が強調したところ
+「テストに出る」「重要」など強調された箇所を箇条書きに。
+
+## 宿題・持ち物・連絡
+「いつまでに何を」が分かる形で箇条書きに。期限が不明なものは（期限未定）と書く。
+
+## あとで確認したい点
+説明が飛んだ箇所や、聞き取れず意味が取れない箇所を挙げる。
+
+書かれていないことを推測で補ってはいけません。聞き取れていない箇所は無理に解釈せず、そのまま指摘してください。要約本文だけを出力し、前置きは書かないでください。`,
+
+  lessonMap:sub=>
+`以下は${sub}の授業の文字起こしの一部です。あとで全体をまとめるための素材として、この部分の内容を漏れなく箇条書きで書き出してください。
+
+- 説明された概念・用語・公式・例題は落とさない
+- 「テストに出る」などの強調、宿題や連絡事項は明示する
+- 要約しすぎず、後で読んで内容が復元できる粒度で書く
+- 前置きは書かず、箇条書きだけを出力する
+
+（これは長い授業の一部です。前後は別途処理されるため、この部分だけを対象にしてください。冒頭・末尾が文の途中で切れていても補完しないでください。）`,
+
+  digest:sub=>
+`あなたは学習アシスタントです。以下は${sub}の授業の要約を日付順に並べたものです。試験対策に使える総まとめを日本語で作ってください。
+
+## 単元ごとの要点
+内容のまとまりごとに見出しを立てて整理する。
+
+## 重要用語・公式の一覧
+授業をまたいで登場したものをまとめる。重複は1つにする。
+
+## くり返し強調されたところ
+複数回出てきた、または強調された内容を挙げる。
+
+## 宿題・提出物の状況
+出された課題を日付とともに一覧にする。
+
+## 弱点になりそうな所
+「あとで確認したい点」として挙がっていた内容を集約する。
+
+元の要約に書かれていないことを推測で補ってはいけません。まとめ本文だけを出力してください。`,
+};
+
+/* ===================== 授業録音：録音エンジン ===================== */
+const ROTATE_MS=20000, OVERLAP_MS=1800;
+const R={active:null,standby:null,running:false,paused:false,segments:[],interim:'',
+         startedAt:0,elapsed:0,timerId:null,rotTimer:null,overlapTimer:null,
+         restarts:[],rotations:0,overlap:true,wakeLock:null,subjectId:null,date:'',title:''};
+
+function speechCtor(){return window.SpeechRecognition||window.webkitSpeechRecognition||null;}
+function fmtDur(ms){
+  const s=Math.floor((ms||0)/1000),h=Math.floor(s/3600),m=Math.floor(s%3600/60),ss=s%60;
+  const p=n=>String(n).padStart(2,'0');
+  return h>0?`${h}:${p(m)}:${p(ss)}`:`${p(m)}:${p(ss)}`;
+}
+function joinSegments(){return R.segments.join('');}   // 日本語なので区切り文字なし
+
+/* 重ね録りで生じる重複を吸収して追加する */
+function pushSegment(t){
+  t=String(t||'').trim();
+  if(!t)return;
+  const n=R.segments.length,last=n?R.segments[n-1]:null;
+  if(last){
+    if(last===t)return;
+    if(last.length>=t.length&&last.indexOf(t)>=0)return;
+    if(t.length>last.length&&t.indexOf(last)===0){R.segments[n-1]=t;return;}
+  }
+  R.segments.push(t);
+}
+function renderLive(){
+  const box=el('v-live'),fin=joinSegments();
+  if(!fin&&!R.interim){
+    box.innerHTML=`<span class="ph">${R.running?'聞き取り中…授業が始まったら話し声を拾います。':'ここに認識結果がリアルタイムで表示されます。'}</span>`;
+  }else{
+    box.innerHTML=esc(fin)+(R.interim?`<span class="interim">${esc(R.interim)}</span>`:'');
+    box.scrollTop=box.scrollHeight;
+  }
+  el('v-count').textContent=fin.length.toLocaleString()+' 文字';
+}
+function updateRecHealth(){
+  const dot=el('v-dot'),t=el('v-health');
+  dot.classList.toggle('live',R.running&&!R.paused);
+  if(!R.running){t.textContent='待機中';return;}
+  if(R.paused){t.textContent='一時停止中';return;}
+  t.textContent=`認識中・入れ替え ${R.rotations} 回`+(R.overlap?'（重ね録り有効）':'（重ね録り無効）');
+}
+function recTick(){
+  el('v-timer').textContent=fmtDur(R.elapsed+(R.paused?0:Date.now()-R.startedAt));
+}
+async function acquireWakeLock(){
+  try{if('wakeLock'in navigator)R.wakeLock=await navigator.wakeLock.request('screen');}catch(e){}
+}
+function releaseWakeLock(){try{if(R.wakeLock){R.wakeLock.release();R.wakeLock=null;}}catch(e){}}
+function showRecError(msg){const e2=el('v-support');e2.textContent=msg;e2.classList.remove('hidden');}
+
+function makeRecognizer(){
+  const api=new (speechCtor())();
+  api.lang='ja-JP';api.continuous=true;api.interimResults=true;api.maxAlternatives=1;
+  api._retired=false;
+  api.onresult=e=>{
+    let interim='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const r=e.results[i],t=(r[0]&&r[0].transcript||'').trim();
+      if(!t)continue;
+      if(r.isFinal)pushSegment(t);else interim+=t;
+    }
+    if(api===R.standby)promote();
+    if(api===R.active)R.interim=interim;
+    renderLive();
+  };
+  api.onerror=e=>{
+    const code=e.error;
+    if(api===R.standby){
+      R.standby=null;api._retired=true;
+      if(code!=='no-speech'){R.overlap=false;updateRecHealth();}
+      return;
+    }
+    if(code==='not-allowed'||code==='service-not-allowed'){
+      showRecError('マイクの使用が許可されていません。ブラウザの設定でマイクを許可してから、もう一度お試しください。');
+      stopRec(false);
+    }else if(code==='audio-capture'){
+      showRecError('マイクを使用できませんでした。他のアプリがマイクを使っていないか確認してください。');
+      stopRec(false);
+    }else if(code==='network'){
+      showRecError('音声認識サーバーに接続できません。ネット接続を確認してください。');
+    }
+  };
+  api.onend=()=>{
+    if(api._retired||api===R.standby||api!==R.active)return;
+    if(!R.running||R.paused)return;
+    const now=Date.now();
+    R.restarts=R.restarts.filter(t=>now-t<10000);
+    R.restarts.push(now);
+    if(R.restarts.length>25){
+      showRecError('音声認識が繰り返し停止しました。ここまでの内容を保存して録音を止めます。');
+      stopRec(true);
+      return;
+    }
+    R.rotations++;startActive();updateRecHealth();
+  };
+  return api;
+}
+function startActive(){
+  const api=makeRecognizer();
+  R.active=api;
+  try{api.start();}catch(e){}
+  scheduleRotate();
+}
+function scheduleRotate(){clearTimeout(R.rotTimer);R.rotTimer=setTimeout(rotate,ROTATE_MS);}
+/* 止められる前に先回りして認識器を入れ替える（iOSの強制終了対策） */
+function rotate(){
+  if(!R.running||R.paused)return;
+  if(!R.overlap){
+    try{R.active&&R.active.stop();}catch(e){}
+    scheduleRotate();return;
+  }
+  const sb=makeRecognizer();
+  R.standby=sb;
+  try{sb.start();}
+  catch(e){R.standby=null;sb._retired=true;R.overlap=false;updateRecHealth();rotate();return;}
+  clearTimeout(R.overlapTimer);
+  R.overlapTimer=setTimeout(promote,OVERLAP_MS);
+}
+function promote(){
+  clearTimeout(R.overlapTimer);
+  const sb=R.standby;
+  if(!sb)return;
+  R.standby=null;
+  const old=R.active;
+  R.active=sb;
+  if(old&&old!==sb){old._retired=true;try{old.stop();}catch(e){}}
+  R.rotations++;updateRecHealth();scheduleRotate();
+}
+function stopAllRecognizers(){
+  clearTimeout(R.rotTimer);clearTimeout(R.overlapTimer);
+  [R.active,R.standby].forEach(a=>{if(!a)return;a._retired=true;try{a.stop();}catch(e){}});
+  R.active=null;R.standby=null;
+}
+function updateRecUI(){
+  const btn=el('v-btn');
+  btn.classList.toggle('on',R.running&&!R.paused);
+  btn.classList.toggle('pause',R.running&&R.paused);
+  el('v-btnlabel').textContent=!R.running?'録音開始':R.paused?'再開':'一時停止';
+  btn.querySelector('.ico').textContent=!R.running?'●':R.paused?'▶':'❚❚';
+  el('v-stop').classList.toggle('hidden',!R.running);
+  el('v-timer').classList.toggle('idle',!R.running);
+  ['v-subj','v-date','v-title'].forEach(id=>el(id).disabled=R.running);
+  el('v-hint').textContent=R.running
+    ?'画面を消したり他のアプリに切り替えると認識が止まります。授業が終わったら「停止して保存」を押してください。'
+    :'マイクの使用を許可してください。録音中は画面を消したり他のアプリに切り替えると認識が止まります。';
+}
+function startRec(){
+  if(R.running)return;
+  if(!speechCtor()){showRecError('このブラウザは音声認識に対応していません。iPhoneはSafari、AndroidはChromeで開いてください。');return;}
+  if(!window.isSecureContext){showRecError('マイクを使うにはHTTPSで開く必要があります。公開URLから開いてください。');return;}
+  el('v-support').classList.add('hidden');
+  R.subjectId=el('v-subj').value||null;
+  R.date=el('v-date').value||today();
+  R.title=el('v-title').value.trim();
+  R.segments=[];R.interim='';R.restarts=[];R.rotations=0;R.overlap=true;
+  R.elapsed=0;R.startedAt=Date.now();R.running=true;R.paused=false;
+  try{startActive();}
+  catch(e){R.running=false;showRecError('音声認識を開始できませんでした：'+e.message);return;}
+  updateRecUI();renderLive();updateRecHealth();
+  R.timerId=setInterval(recTick,250);recTick();
+  acquireWakeLock();
+}
+function pauseRec(){
+  if(!R.running||R.paused)return;
+  R.paused=true;R.elapsed+=Date.now()-R.startedAt;
+  stopAllRecognizers();updateRecUI();updateRecHealth();recTick();
+}
+function resumeRec(){
+  if(!R.running||!R.paused)return;
+  R.paused=false;R.startedAt=Date.now();R.restarts=[];
+  try{startActive();}catch(e){showRecError('再開できませんでした：'+e.message);}
+  updateRecUI();updateRecHealth();
+}
+function stopRec(save_){
+  if(!R.running)return;
+  if(!R.paused)R.elapsed+=Date.now()-R.startedAt;
+  R.running=false;R.paused=false;
+  clearInterval(R.timerId);R.timerId=null;
+  stopAllRecognizers();releaseWakeLock();
+  const transcript=joinSegments().trim();
+  R.interim='';
+  updateRecUI();renderLive();updateRecHealth();
+  if(!save_)return;
+  if(!transcript){toast('文字起こしが空のため保存しませんでした');return;}
+
+  const sname=subjName(R.subjectId);
+  const rec={
+    id:uid(),subjectId:R.subjectId,date:R.date,
+    title:R.title||`${sname} ${fmtJP(R.date)}の授業`,
+    transcript,summary:'',summaryAt:0,model:'',durationMs:R.elapsed,up:Date.now(),
+  };
+  S.recordings.push(rec);
+  el('v-title').value='';
+  R.elapsed=0;el('v-timer').textContent='00:00';
+  save();
+  toast('保存しました');
+  openRec(rec.id);
+  if(hasKey())summarizeRec(rec.id);   /* キーがあればそのまま要約まで走らせる */
+}
+
+/* ===================== 授業録音：一覧 ===================== */
+function recSorted(list){
+  return [...list].sort((a,b)=>(b.date||'').localeCompare(a.date||'')||(b.up||0)-(a.up||0));
+}
+function renderVoice(){
+  const filter=el('fv-subj').value;
+  const list=S.recordings.filter(r=>filter==='all'||((r.subjectId||'')===filter));
+  el('v-listcount').textContent=S.recordings.length?`${list.length}件`:'';
+  if(!S.recordings.length){
+    el('v-list').innerHTML='<div class="empty">まだ録音がありません<br>上で教科を選んで「録音開始」を押してください</div>';
+    return;
+  }
+  if(!list.length){el('v-list').innerHTML='<div class="empty">この教科の録音はありません</div>';return;}
+
+  /* 教科ごとにまとめる（教科タブの並び順、未分類は最後） */
+  const groups=[];
+  for(const s of S.subjects){
+    const items=recSorted(list.filter(r=>r.subjectId===s.id));
+    if(items.length)groups.push({id:s.id,name:s.name,color:s.color,items});
+  }
+  const none=recSorted(list.filter(r=>!r.subjectId||!subjOf(r.subjectId)));
+  if(none.length)groups.push({id:'',name:'未分類',color:'#a8b3cf',items:none});
+
+  el('v-list').innerHTML=groups.map(g=>{
+    const done=g.items.filter(r=>r.summary).length;
+    const dg=g.id?S.digests.find(d=>d.subjectId===g.id):null;
+    return `<div class="dgroup">
+      <div class="dghead">
+        <span class="sdot" style="background:${g.color}"></span>
+        <span class="dt">${esc(g.name)}</span>
+        <span class="cnt">${g.items.length}件・要約済み${done}</span>
+        ${g.id?`<button class="claudebtn" data-digest="${g.id}">✨ 教科まとめ${dg?'を見る':''}</button>`:''}
+      </div>
+      <div class="alist">${g.items.map(r=>`
+        <div class="ritem" data-rid="${r.id}">
+          <div class="rmain">
+            <div class="rtitle">${esc(r.title)}</div>
+            <div class="rmeta">
+              <span>${fmtJP(r.date)}</span>
+              <span>${fmtDur(r.durationMs)}</span>
+              <span>${(r.transcript||'').length.toLocaleString()}文字</span>
+              ${r.summary?'<span class="okbadge">要約済み</span>':'<span class="nobadge">未要約</span>'}
+            </div>
+          </div>
+        </div>`).join('')}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ===================== 授業録音：詳細 ===================== */
+let curRec=null,busy=false;
+function getRec(id){return S.recordings.find(r=>r.id===id)||null;}
+function openRec(id){
+  const r=getRec(id);if(!r)return;
+  curRec=id;
+  el('rec-head').textContent=`🎙️ ${subjName(r.subjectId)}・${fmtJP(r.date)}`;
+  renderSubjectSelects();
+  el('rec-subj').value=r.subjectId||'';
+  el('rec-date').value=r.date||today();
+  el('rec-title').value=r.title||'';
+  el('rec-text').value=r.transcript||'';
+  el('rec-textcount').textContent=`${(r.transcript||'').length.toLocaleString()} 文字`;
+  el('rec-summary').innerHTML=mdToHtml(r.summary);
+  el('rec-summary').classList.remove('stream');
+  el('rec-status').textContent=r.summaryAt?`${new Date(r.summaryAt).toLocaleString('ja-JP')} に ${r.model||''} で作成`:'';
+  el('rec-keynote').classList.toggle('hidden',hasKey());
+  el('rec-sum').textContent=r.summary?'✨ 要約を作り直す':'✨ 要約を作る';
+  el('rec-sum').disabled=!hasKey();
+  el('rec-bar').classList.add('hidden');
+  el('rec-abort').classList.add('hidden');
+  el('rec-modal').classList.add('open');
+}
+function closeRec(){
+  if(busy){toast('要約の実行中です。中止するか終わるまでお待ちください');return;}
+  el('rec-modal').classList.remove('open');curRec=null;
+}
+function saveRecEdits(){
+  const r=getRec(curRec);if(!r)return;
+  r.subjectId=el('rec-subj').value||null;
+  r.date=el('rec-date').value||r.date;
+  r.title=el('rec-title').value.trim()||r.title;
+  r.transcript=el('rec-text').value;
+  r.up=Date.now();
+  save();
+}
+function recPromptText(r){
+  return `${subjName(r.subjectId)}の授業（${fmtJP(r.date)}・${r.title}）の文字起こしです。`
+    +`\n\n要点・重要用語・先生が強調したところ・宿題や連絡事項に分けて、復習用にまとめてください。`
+    +`\n\n【文字起こし】\n${r.transcript}`;
+}
+
+async function summarizeRec(id){
+  if(busy)return;
+  const r=getRec(id);if(!r)return;
+  if(!hasKey()){toast('設定タブでAPIキーを登録してください');return;}
+  if(curRec===id&&el('rec-text').value.trim()!==r.transcript){r.transcript=el('rec-text').value.trim();r.up=Date.now();}
+  if(!r.transcript){toast('文字起こしが空です');return;}
+
+  const sname=subjName(r.subjectId);
+  const chunks=splitText(r.transcript,CHUNK_CHARS);
+  const showing=()=>curRec===id&&el('rec-modal').classList.contains('open');
+  busy=true;aborter=new AbortController();
+  const sig=aborter.signal;
+  if(showing()){
+    el('rec-sum').disabled=true;
+    el('rec-abort').classList.remove('hidden');
+    el('rec-summary').classList.add('stream');
+    el('rec-summary').innerHTML='<span class="caret"></span>';
+    el('rec-status').innerHTML='<span class="spin"></span>要約を準備中…';
+  }
+  const progress=(d,t2,note)=>{
+    if(!showing())return;
+    const bar=el('rec-bar');
+    if(t2<=1){bar.classList.add('hidden');return;}
+    bar.classList.remove('hidden');
+    bar.querySelector('i').style.width=Math.round(d/t2*100)+'%';
+    el('rec-status').innerHTML=`<span class="spin"></span>${esc(note)}（${d}/${t2}）`;
+  };
+  const stream=t2=>{if(showing())el('rec-summary').innerHTML=esc(t2)+'<span class="caret"></span>';};
+
+  try{
+    let text='';
+    if(chunks.length===1){
+      if(showing())el('rec-status').innerHTML='<span class="spin"></span>要約を作成中…';
+      text=(await callClaude(SYS.lesson(sname),r.transcript,
+        {effort:'medium',signal:sig,maxTokens:16000,onDelta:stream})).text;
+    }else{
+      const notes=[];
+      for(let i=0;i<chunks.length;i++){
+        if(sig.aborted)throw new DOMException('aborted','AbortError');
+        progress(i,chunks.length+1,'授業の内容を読み取り中');
+        const out=await callClaude(SYS.lessonMap(sname),chunks[i],{effort:'low',signal:sig,maxTokens:8000});
+        notes.push(`【${i+1}/${chunks.length}】\n${out.text}`);
+      }
+      progress(chunks.length,chunks.length+1,'要約にまとめ中');
+      text=(await callClaude(SYS.lesson(sname),
+        `以下は長い授業を分割して読み取ったメモです。全体をひとつの要約にまとめてください。\n\n${notes.join('\n\n')}`,
+        {effort:'medium',signal:sig,maxTokens:16000,onDelta:stream})).text;
+    }
+    r.summary=text;r.summaryAt=Date.now();r.model=modelInfo().id.replace('claude-','');r.up=Date.now();
+    save();
+    if(showing()){
+      el('rec-summary').classList.remove('stream');
+      el('rec-summary').innerHTML=mdToHtml(text);
+      el('rec-status').textContent=chunks.length>1?`完了しました（${chunks.length}分割で処理）`:'完了しました。';
+      el('rec-sum').textContent='✨ 要約を作り直す';
+    }else toast(`「${r.title}」の要約ができました`);
+  }catch(e){
+    if(showing()){
+      el('rec-summary').classList.remove('stream');
+      el('rec-summary').innerHTML=mdToHtml(r.summary);
+      el('rec-status').innerHTML=e.name==='AbortError'
+        ?'<span style="color:var(--warn)">中止しました。</span>'
+        :`<span style="color:var(--danger)">${esc(e.message)}</span>`;
+    }else toast(e.name==='AbortError'?'要約を中止しました':'要約に失敗しました：'+e.message);
+  }finally{
+    busy=false;aborter=null;
+    if(showing()){
+      el('rec-sum').disabled=!hasKey();
+      el('rec-abort').classList.add('hidden');
+      el('rec-bar').classList.add('hidden');
+    }
+  }
+}
+
+/* ===================== 授業録音：教科まとめ ===================== */
+let curDigest=null;
+function openDigest(subjectId){
+  const s=subjOf(subjectId);if(!s)return;
+  curDigest=subjectId;
+  const d=S.digests.find(x=>x.subjectId===subjectId);
+  const n=S.recordings.filter(r=>r.subjectId===subjectId&&r.summary).length;
+  el('dg-head').textContent=`✨ ${s.name}のまとめ`;
+  el('dg-body').innerHTML=d?mdToHtml(d.text):`<div class="empty" style="padding:6px">まだまとめがありません。<br>要約済みの授業 ${n} 件からまとめを作れます。</div>`;
+  el('dg-body').classList.remove('stream');
+  el('dg-status').textContent=d?`${new Date(d.up).toLocaleString('ja-JP')} に ${d.count}件の授業から作成`:'';
+  el('dg-run').textContent=d?'✨ まとめを作り直す':'✨ まとめを作る';
+  el('dg-run').disabled=!hasKey()||n===0;
+  el('dg-bar').classList.add('hidden');
+  el('dg-modal').classList.add('open');
+  if(!hasKey())el('dg-status').textContent='設定タブでAPIキーを登録すると作成できます。';
+  else if(n===0)el('dg-status').textContent='要約済みの授業がまだありません。先に各授業の要約を作ってください。';
+}
+function closeDigest(){
+  if(busy){toast('実行中です。終わるまでお待ちください');return;}
+  el('dg-modal').classList.remove('open');curDigest=null;
+}
+async function runDigest(){
+  if(busy||!curDigest)return;
+  const s=subjOf(curDigest);if(!s)return;
+  const done=recSorted(S.recordings.filter(r=>r.subjectId===curDigest&&r.summary)).reverse();
+  if(!done.length){toast('要約済みの授業がありません');return;}
+
+  const material=done.map(r=>`### ${fmtJP(r.date)}　${r.title}\n${r.summary}`).join('\n\n');
+  const chunks=splitText(material,CHUNK_CHARS*3);
+  busy=true;aborter=new AbortController();
+  const sig=aborter.signal;
+  el('dg-run').disabled=true;
+  el('dg-body').classList.add('stream');
+  el('dg-body').innerHTML='<span class="caret"></span>';
+  el('dg-status').innerHTML='<span class="spin"></span>まとめを作成中…';
+  try{
+    let src=material;
+    if(chunks.length>1){          /* 授業数が多いときは一度圧縮してからまとめる */
+      const parts=[];
+      for(let i=0;i<chunks.length;i++){
+        if(sig.aborted)throw new DOMException('aborted','AbortError');
+        el('dg-bar').classList.remove('hidden');
+        el('dg-bar').querySelector('i').style.width=Math.round(i/(chunks.length+1)*100)+'%';
+        el('dg-status').innerHTML=`<span class="spin"></span>要約を読み取り中（${i+1}/${chunks.length}）`;
+        const out=await callClaude(SYS.lessonMap(s.name),chunks[i],{effort:'low',signal:sig,maxTokens:8000});
+        parts.push(out.text);
+      }
+      src=parts.join('\n\n');
+    }
+    const out=await callClaude(SYS.digest(s.name),src,
+      {effort:'medium',signal:sig,maxTokens:16000,onDelta:t2=>{el('dg-body').innerHTML=esc(t2)+'<span class="caret"></span>';}});
+    const prev=S.digests.find(x=>x.subjectId===curDigest);
+    if(prev)Object.assign(prev,{text:out.text,count:done.length,up:Date.now()});
+    else S.digests.push({id:uid(),subjectId:curDigest,text:out.text,count:done.length,up:Date.now()});
+    save();
+    el('dg-body').classList.remove('stream');
+    el('dg-body').innerHTML=mdToHtml(out.text);
+    el('dg-status').textContent=`${done.length}件の授業からまとめました。`;
+    el('dg-run').textContent='✨ まとめを作り直す';
+  }catch(e){
+    const d=S.digests.find(x=>x.subjectId===curDigest);
+    el('dg-body').classList.remove('stream');
+    el('dg-body').innerHTML=d?mdToHtml(d.text):'<div class="empty" style="padding:6px">まとめを作成できませんでした</div>';
+    el('dg-status').innerHTML=e.name==='AbortError'
+      ?'<span style="color:var(--warn)">中止しました。</span>'
+      :`<span style="color:var(--danger)">${esc(e.message)}</span>`;
+  }finally{
+    busy=false;aborter=null;
+    el('dg-run').disabled=!hasKey();
+    el('dg-bar').classList.add('hidden');
+  }
+}
+
+/* ===================== 授業録音：共有・コピー ===================== */
+async function shareText(text,okMsg){
+  try{
+    if(navigator.share){await navigator.share({text});return;}
+  }catch(e){if(e&&e.name==='AbortError')return;}
+  try{await navigator.clipboard.writeText(text);toast(okMsg||'コピーしました');}
+  catch(e){
+    const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();
+    try{document.execCommand('copy');toast(okMsg||'コピーしました');}catch(_){toast('コピーできませんでした');}
+    ta.remove();
+  }
+}
+async function copyToClipboard(text){
+  try{await navigator.clipboard.writeText(text);toast('コピーしました');}
+  catch(e){
+    const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();
+    try{document.execCommand('copy');toast('コピーしました');}catch(_){toast('コピーできませんでした');}
+    ta.remove();
+  }
+}
+
+/* ===================== 授業録音：フォルダへ要約を書き出す ===================== */
+const SUM_KEY='study-manager-sumwritten-v1';
+function loadSumWritten(){try{return JSON.parse(localStorage.getItem(SUM_KEY))||{};}catch(e){return{};}}
+async function writeSummaryFiles(){
+  if(!dirHandle)return;
+  const written=loadSumWritten();
+  const withSum=S.recordings.filter(r=>r.summary);
+  if(!withSum.length&&!S.digests.length)return;
+  let root;
+  try{root=await dirHandle.getDirectoryHandle('授業要約',{create:true});}catch(e){return;}
+  for(const r of withSum){
+    if(written[r.id]===r.up)continue;
+    try{
+      const dir=await root.getDirectoryHandle(sanitizeName(subjName(r.subjectId)),{create:true});
+      const fh=await dir.getFileHandle(sanitizeName(`${r.date}_${r.title}.md`),{create:true});
+      const w=await fh.createWritable();
+      await w.write(`# ${r.title}\n\n${subjName(r.subjectId)} / ${fmtJP(r.date)} / ${fmtDur(r.durationMs)}\n\n${r.summary}\n\n---\n\n## 文字起こし\n\n${r.transcript}\n`);
+      await w.close();
+      written[r.id]=r.up;
+    }catch(e){}
+  }
+  for(const d of S.digests){
+    if(written[d.id]===d.up)continue;
+    const s=subjOf(d.subjectId);if(!s)continue;
+    try{
+      const dir=await root.getDirectoryHandle(sanitizeName(s.name),{create:true});
+      const fh=await dir.getFileHandle(sanitizeName(`_${s.name}_まとめ.md`),{create:true});
+      const w=await fh.createWritable();
+      await w.write(`# ${s.name} まとめ\n\n${d.count}件の授業から作成\n\n${d.text}\n`);
+      await w.close();
+      written[d.id]=d.up;
+    }catch(e){}
+  }
+  try{localStorage.setItem(SUM_KEY,JSON.stringify(written));}catch(e){}
+}
+
+/* ===================== APIキー設定 ===================== */
+function renderKeySettings(){
+  el('k-key').value=AI.apiKey||'';
+  el('k-model').innerHTML=MODELS.map(m=>`<option value="${m.id}"${m.id===AI.model?' selected':''}>${esc(m.label)}</option>`).join('');
+  el('k-cost').textContent=COST_NOTE[AI.model]||'';
+}
+
 /* ===================== イベント ===================== */
 function bindEvents(){
   /* タブ */
   document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
     document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===t));
-    for(const p of['tasks','notes','subjects','settings'])el('panel-'+p).classList.toggle('hidden',p!==t.dataset.tab);
+    for(const p of['tasks','notes','voice','subjects','settings'])el('panel-'+p).classList.toggle('hidden',p!==t.dataset.tab);
   }));
   /* 今日のTODO */
   el('btn-todo-claude').addEventListener('click',todoToClaude);
@@ -1111,6 +1963,83 @@ function bindEvents(){
     if(cb){openClaude(cb.dataset.date);return;}
     const fi=e.target.closest('.fitem');
     if(fi)openPreview(fi.dataset.id);
+  });
+  /* 授業録音 */
+  el('v-btn').addEventListener('click',()=>{
+    if(!R.running)startRec();
+    else if(R.paused)resumeRec();
+    else pauseRec();
+  });
+  el('v-stop').addEventListener('click',()=>stopRec(true));
+  el('fv-subj').addEventListener('change',renderVoice);
+  el('v-list').addEventListener('click',e=>{
+    const dg=e.target.closest('[data-digest]');
+    if(dg){openDigest(dg.dataset.digest);return;}
+    const it=e.target.closest('.ritem');
+    if(it)openRec(it.dataset.rid);
+  });
+  /* 録音の詳細 */
+  el('rec-close').addEventListener('click',closeRec);
+  el('rec-modal').addEventListener('click',e=>{if(e.target===el('rec-modal'))closeRec();});
+  el('rec-text').addEventListener('input',()=>{el('rec-textcount').textContent=`${el('rec-text').value.length.toLocaleString()} 文字`;});
+  el('rec-sum').addEventListener('click',()=>{saveRecEdits();summarizeRec(curRec);});
+  el('rec-abort').addEventListener('click',()=>{if(aborter)aborter.abort();});
+  el('rec-save').addEventListener('click',()=>{saveRecEdits();toast('保存しました');closeRec();});
+  el('rec-copy').addEventListener('click',()=>{
+    const r=getRec(curRec);if(!r)return;
+    copyToClipboard(r.summary?`【${r.title}】${subjName(r.subjectId)}・${fmtJP(r.date)}\n\n${r.summary}`:r.transcript);
+  });
+  el('rec-share').addEventListener('click',()=>{
+    const r=getRec(curRec);if(!r)return;
+    saveRecEdits();
+    shareText(r.summary
+      ?`【${r.title}】${subjName(r.subjectId)}・${fmtJP(r.date)}\n\n${r.summary}`
+      :recPromptText(r),'コピーしました（Claudeに貼り付けてください）');
+  });
+  el('rec-del').addEventListener('click',()=>{
+    const r=getRec(curRec);if(!r)return;
+    if(busy){toast('要約の実行中です');return;}
+    if(!confirm(`「${r.title}」を削除しますか？文字起こしと要約が消えます。`))return;
+    S.deleted[r.id]=Date.now();
+    S.recordings=S.recordings.filter(x=>x.id!==r.id);
+    el('rec-modal').classList.remove('open');curRec=null;
+    save();toast('削除しました');
+  });
+  /* 教科まとめ */
+  el('dg-close').addEventListener('click',closeDigest);
+  el('dg-modal').addEventListener('click',e=>{if(e.target===el('dg-modal'))closeDigest();});
+  el('dg-run').addEventListener('click',runDigest);
+  el('dg-copy').addEventListener('click',()=>{
+    const d=S.digests.find(x=>x.subjectId===curDigest);
+    if(d)copyToClipboard(`【${subjName(curDigest)}のまとめ】\n\n${d.text}`);
+  });
+  el('dg-share').addEventListener('click',()=>{
+    const d=S.digests.find(x=>x.subjectId===curDigest);
+    if(d)shareText(`【${subjName(curDigest)}のまとめ】\n\n${d.text}`);
+  });
+  /* APIキー */
+  el('k-save').addEventListener('click',()=>{
+    AI.apiKey=el('k-key').value.trim();saveAI();
+    el('k-status').textContent=AI.apiKey?'キーを保存しました。授業録音タブで要約が使えます。':'キーを空にしました。';
+    renderVoice();
+  });
+  el('k-clear').addEventListener('click',()=>{
+    AI.apiKey='';el('k-key').value='';saveAI();
+    el('k-status').textContent='キーを削除しました。';
+  });
+  el('k-model').addEventListener('change',e=>{AI.model=e.target.value;saveAI();el('k-cost').textContent=COST_NOTE[AI.model]||'';});
+  el('k-test').addEventListener('click',async()=>{
+    AI.apiKey=el('k-key').value.trim();saveAI();
+    el('k-status').innerHTML='<span class="spin"></span>接続を確認しています…';
+    try{
+      await callClaude('ひとことだけ日本語で答えてください。','OK とだけ返してください。',{effort:'low',maxTokens:4096});
+      el('k-status').innerHTML='<span style="color:var(--ok)">接続できました。要約が使えます。</span>';
+    }catch(e){el('k-status').innerHTML=`<span style="color:var(--danger)">${esc(e.message)}</span>`;}
+  });
+  /* 録音中の離脱・復帰 */
+  window.addEventListener('beforeunload',e=>{if(R.running||busy){e.preventDefault();e.returnValue='';}});
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible'&&R.running&&!R.paused)acquireWakeLock();
   });
   /* プレビュー */
   el('pv-close').addEventListener('click',closePreview);
@@ -1158,12 +2087,12 @@ function bindEvents(){
     e.target.value='';
   });
   el('btn-wipe').addEventListener('click',async()=>{
-    if(!confirm('すべてのデータ（教科・課題・ノートファイル）を削除します。よろしいですか？'))return;
+    if(!confirm('すべてのデータ（教科・課題・ノートファイル・授業録音）を削除します。よろしいですか？'))return;
     if(!confirm('本当に削除しますか？この操作は取り消せません。'))return;
     const now=Date.now();
-    for(const x of[...S.subjects,...S.assignments])S.deleted[x.id]=now;
+    for(const x of[...S.subjects,...S.assignments,...S.recordings,...S.digests])S.deleted[x.id]=now;
     for(const f of FILES)S.deleted[f.id]=now;
-    S.subjects=[];S.assignments=[];
+    S.subjects=[];S.assignments=[];S.recordings=[];S.digests=[];
     for(const f of FILES)await idbDel(f.id);
     await refreshFiles();
     save();
@@ -1178,7 +2107,11 @@ function bindEvents(){
 /* ===================== 起動 ===================== */
 (async function init(){
   el('n-date').value=today();
+  el('v-date').value=today();
   bindEvents();
+  renderKeySettings();
+  updateRecUI();renderLive();updateRecHealth();
+  if(!speechCtor())showRecError('このブラウザは音声認識に対応していません。iPhoneはSafari、AndroidはChromeで開いてください。');
   await refreshFiles().catch(e=>console.warn(e));
   renderAll();
   restoreFolder();

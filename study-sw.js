@@ -1,5 +1,5 @@
 // オフライン対応用 Service Worker（stale-while-revalidate）
-const CACHE = 'study-manager-v1';
+const CACHE = 'study-manager-v2';
 const ASSETS = ['./', './index.html', './study-manifest.json', './icon-study-180.png', './icon-study-192.png', './icon-study-512.png'];
 
 self.addEventListener('install', e => {
